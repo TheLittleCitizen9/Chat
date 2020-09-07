@@ -13,7 +13,6 @@ namespace ChatClient
         private int _port;
         private Byte[] _bytesReceived;
         private TcpClient _client;
-        private IPEndPoint _ipe;
         private ConsoleDisplayer _consoleDisplayer;
 
         public Client()
@@ -25,7 +24,7 @@ namespace ChatClient
         public void RunClient()
         {
             var ipa = GetServerDetails();
-            ConnectToServer(ipa);
+            ConnectToServer();
             ReadFromServer();
             WriteMessage();
         }
@@ -40,15 +39,13 @@ namespace ChatClient
 
             return ipa;
         }
-        public void ConnectToServer(IPAddress ipa)
+        public void ConnectToServer()
         {
-            _ipe = new IPEndPoint(ipa, _port);
-
             _client = new TcpClient(_ip, _port);
         }
         public void WriteMessage()
         {
-            while(true)
+            while (true)
             {
                 _consoleDisplayer.PrintValueToConsole("Enter message to send");
                 string message = Console.ReadLine();
@@ -63,13 +60,13 @@ namespace ChatClient
                     nwStream.Write(messageToSend);
                 }
             }
-            
+
         }
         public void ReadFromServer()
         {
             Task.Run(() =>
             {
-                while(true)
+                while (true)
                 {
                     try
                     {
@@ -77,13 +74,13 @@ namespace ChatClient
                         nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
                         _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
                     }
-                    catch (IOException e)
+                    catch (System.IO.IOException e)
                     {
-                        _consoleDisplayer.PrintValueToConsole($"IOException reading from socket: {e.Message}");
+                        _consoleDisplayer.PrintValueToConsole($"Server disconnected");
+                        Exit();
                     }
                 }
             });
-            
         }
 
         private void Exit()
