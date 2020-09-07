@@ -11,7 +11,7 @@ namespace ChatServer
 {
     public class Server
     {
-        private ConcurrentDictionary<TcpClient, string> _clients;
+        private List<TcpClient> _clients;
         private int _port;
         private TcpListener _server;
         private const string IP = "10.1.0.17";
@@ -19,11 +19,59 @@ namespace ChatServer
 
         public Server()
         {
-            _clients = new ConcurrentDictionary<TcpClient, string>();
+            _clients = new List<TcpClient>();
             _consoleDisplayer = new ConsoleDisplayer();
         }
 
-        public void CreateServerSocket()
+        public void StartListening()
+        {
+            CreateServerSocket();
+            while (true)
+            {
+                var clientSocket = _server.AcceptTcpClient();
+                _clients.Add(clientSocket);
+                Task task = new Task(() => ChatWithClient(clientSocket));
+                task.Start();
+            }
+        }
+
+        public void ChatWithClient(TcpClient clientSocket)
+        {
+            try
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[1024];
+                    NetworkStream nwStream = clientSocket.GetStream();
+                    int bytesRecieved = nwStream.Read(buffer);
+                    string stringData = Encoding.ASCII.GetString(buffer);
+                    string messageToClients = $"Client {clientSocket.Client.RemoteEndPoint} - {stringData}";
+                    SendToClients(messageToClients);
+                }
+            }
+            catch (Exception e)
+            {
+                RemoveClient(clientSocket);
+                _consoleDisplayer.PrintValueToConsole($"Client {clientSocket.Client.RemoteEndPoint} disconnected");
+            }
+        }
+
+        public void SendToClients(string dataToSend)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(dataToSend);
+            foreach (var client in _clients)
+            {
+                NetworkStream nwStream = client.GetStream();
+                nwStream.Write(data);
+            }
+        }
+
+        private void RemoveClient(TcpClient client)
+        {
+            _clients.Remove(client);
+        }
+
+        private void CreateServerSocket()
         {
             IPAddress ipa = IPAddress.Parse(IP);
             _consoleDisplayer.PrintValueToConsole("Enter PORT");
@@ -35,55 +83,6 @@ namespace ChatServer
             _server.Start(100);
 
             _consoleDisplayer.PrintValueToConsole("Server started");
-
-            while (true)
-            {
-                var clientSocket = _server.AcceptTcpClient();
-                Task task = new Task(() => Chat(clientSocket));
-                task.Start();
-            }
-        }
-
-        private void Chat(TcpClient clientSocket)
-        {
-            BinaryReader reader = new BinaryReader(clientSocket.GetStream());
-
-            try
-            {
-                while (true)
-                {
-                    string message = reader.ReadString();
-                    foreach (var client in _clients.Keys)
-                    {
-                        BinaryWriter writer = new BinaryWriter(client.GetStream());
-                        writer.Write(message);
-                    }
-                }
-            }
-            catch (EndOfStreamException)
-            {
-                _consoleDisplayer.PrintValueToConsole($"client disconnecting: {clientSocket.Client.RemoteEndPoint}");
-                clientSocket.Client.Shutdown(SocketShutdown.Both);
-            }
-            catch (IOException e)
-            {
-                _consoleDisplayer.PrintValueToConsole($"IOException reading from {clientSocket.Client.RemoteEndPoint}: {e.Message}");
-            }
-
-            clientSocket.Close();
-            RemoveClient(clientSocket);
-            _consoleDisplayer.PrintValueToConsole($"{GetClientsCount()} clients connected");
-        }
-
-        private int GetClientsCount()
-        {
-            return _clients.Count;
-        }
-
-        private void RemoveClient(TcpClient client)
-        {
-            string returnedValue;
-            _clients.TryRemove(client, out returnedValue);
         }
     }
 }
