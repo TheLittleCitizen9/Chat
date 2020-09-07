@@ -11,15 +11,16 @@ namespace ChatServer
 {
     public class Server
     {
-        private List<TcpClient> _clients;
+        private List<User> _clients;
         private int _port;
         private TcpListener _server;
         private const string IP = "10.1.0.17";
         private ConsoleDisplayer _consoleDisplayer;
+        private int _counter = 0;
 
         public Server()
         {
-            _clients = new List<TcpClient>();
+            _clients = new List<User>();
             _consoleDisplayer = new ConsoleDisplayer();
         }
 
@@ -29,32 +30,35 @@ namespace ChatServer
             while (true)
             {
                 var clientSocket = _server.AcceptTcpClient();
-                _clients.Add(clientSocket);
-                string clientConnectedMsg = $"Client {clientSocket.Client.RemoteEndPoint} connected";
+                _counter++;
+                var user = new User(clientSocket, _counter);
+                _clients.Add(user);
+                string clientConnectedMsg = $"Client {user.Id} connected";
                 SendToClients(clientConnectedMsg);
-                Task task = new Task(() => ChatWithClient(clientSocket));
+                Task task = new Task(() => ChatWithClient(user));
                 task.Start();
             }
         }
 
-        public void ChatWithClient(TcpClient clientSocket)
+        public void ChatWithClient(User user)
         {
             try
             {
                 while (true)
                 {
+                    //check what kind of chat the user wants
                     byte[] buffer = new byte[1024];
-                    NetworkStream nwStream = clientSocket.GetStream();
+                    NetworkStream nwStream = user.ClientSocket.GetStream();
                     int bytesRecieved = nwStream.Read(buffer);
                     string stringData = Encoding.ASCII.GetString(buffer);
-                    string messageToClients = $"Client {clientSocket.Client.RemoteEndPoint} - {stringData}";
+                    //need to check the stringData for return value
+                    string messageToClients = $"Client {user.Id} - {stringData}";
                     SendToClients(messageToClients);
                 }
             }
             catch (Exception e)
             {
-                DisconnectClient(clientSocket);
-                _consoleDisplayer.PrintValueToConsole(e.Message);
+                DisconnectClient(user);
             }
         }
 
@@ -65,7 +69,7 @@ namespace ChatServer
             {
                 try
                 {
-                    NetworkStream nwStream = client.GetStream();
+                    NetworkStream nwStream = client.ClientSocket.GetStream();
                     nwStream.Write(data);
                 }
                 catch (Exception e)
@@ -75,17 +79,17 @@ namespace ChatServer
             }
         }
 
-        private void DisconnectClient(TcpClient clientSocket)
+        private void DisconnectClient(User user)
         {
-            string clientDisconnectedMsg = $"Client {clientSocket.Client.RemoteEndPoint} disconnected";
+            string clientDisconnectedMsg = $"Client {user.ClientSocket.Client.RemoteEndPoint} disconnected";
             _consoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
-            RemoveClient(clientSocket);
+            RemoveClient(user);
             SendToClients(clientDisconnectedMsg);
         }
 
-        private void RemoveClient(TcpClient client)
+        private void RemoveClient(User user)
         {
-            _clients.Remove(client);
+            _clients.Remove(user);
         }
 
         private void CreateServerSocket()
