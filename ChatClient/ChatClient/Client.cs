@@ -14,10 +14,12 @@ namespace ChatClient
         private Byte[] _bytesReceived;
         private TcpClient _client;
         private IPEndPoint _ipe;
+        private ConsoleDisplayer _consoleDisplayer;
 
         public Client()
         {
             _bytesReceived = new Byte[256];
+            _consoleDisplayer = new ConsoleDisplayer();
         }
 
         public void RunClient()
@@ -32,11 +34,11 @@ namespace ChatClient
 
         public IPAddress GetServerDetails()
         {
-            Console.WriteLine("Enter IP");
+            _consoleDisplayer.PrintValueToConsole("Enter IP");
             _ip = Console.ReadLine();
             IPAddress ipa = IPAddress.Parse(_ip);
 
-            Console.WriteLine("Enter PORT");
+            _consoleDisplayer.PrintValueToConsole("Enter PORT");
             _port = int.Parse(Console.ReadLine());
 
             return ipa;
@@ -58,12 +60,12 @@ namespace ChatClient
                 while ((str = Console.ReadLine()) != "")
                 {
                     BinaryWriter writer = new BinaryWriter(_client.GetStream());
-                    writer.Write(str);
+                    _consoleDisplayer.PrintValueToConsole(str);
                 }
             }
             catch (IOException e)
             {
-                Console.WriteLine($"IOException writing to socket: {e.Message}");
+                _consoleDisplayer.PrintValueToConsole($"IOException writing to socket: {e.Message}");
             }
         }
 
@@ -73,12 +75,12 @@ namespace ChatClient
             {
                 NetworkStream nwStream = _client.GetStream();
                 nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
-                Console.WriteLine(Encoding.ASCII.GetString(_bytesReceived));
+                _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
                 _client.Close();
             }
             catch (IOException e)
             {
-                Console.WriteLine($"IOException reading from socket: {e.Message}");
+                _consoleDisplayer.PrintValueToConsole($"IOException reading from socket: {e.Message}");
             }
         }
     }
