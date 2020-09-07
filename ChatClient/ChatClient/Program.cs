@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace ChatClient
 {
@@ -6,8 +6,11 @@ namespace ChatClient
     {
         static void Main(string[] args)
         {
-            Client client = new Client();
-            client.RunClient();
+            Dictionary<string, string> options = new Dictionary<string, string>();
+            options.Add("1", "Global chat");
+            ClientManager clientManager = new ClientManager(options);
+            clientManager.InitializeClient();
+            clientManager.NavigateToChoice();
         }
     }
 }
