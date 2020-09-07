@@ -30,6 +30,8 @@ namespace ChatServer
             {
                 var clientSocket = _server.AcceptTcpClient();
                 _clients.Add(clientSocket);
+                string clientConnectedMsg = $"Client {clientSocket.Client.RemoteEndPoint} connected";
+                SendToClients(clientConnectedMsg);
                 Task task = new Task(() => ChatWithClient(clientSocket));
                 task.Start();
             }
@@ -51,8 +53,8 @@ namespace ChatServer
             }
             catch (Exception e)
             {
-                RemoveClient(clientSocket);
-                _consoleDisplayer.PrintValueToConsole($"Client {clientSocket.Client.RemoteEndPoint} disconnected");
+                DisconnectClient(clientSocket);
+                _consoleDisplayer.PrintValueToConsole(e.Message);
             }
         }
 
@@ -61,9 +63,24 @@ namespace ChatServer
             byte[] data = Encoding.ASCII.GetBytes(dataToSend);
             foreach (var client in _clients)
             {
-                NetworkStream nwStream = client.GetStream();
-                nwStream.Write(data);
+                try
+                {
+                    NetworkStream nwStream = client.GetStream();
+                    nwStream.Write(data);
+                }
+                catch (Exception e)
+                {
+                    _consoleDisplayer.PrintValueToConsole(e.Message);
+                }
             }
+        }
+
+        private void DisconnectClient(TcpClient clientSocket)
+        {
+            string clientDisconnectedMsg = $"Client {clientSocket.Client.RemoteEndPoint} disconnected";
+            _consoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
+            RemoveClient(clientSocket);
+            SendToClients(clientDisconnectedMsg);
         }
 
         private void RemoveClient(TcpClient client)
