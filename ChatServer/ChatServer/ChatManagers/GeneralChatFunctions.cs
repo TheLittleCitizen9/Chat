@@ -5,12 +5,13 @@ using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class GlobalChatFunctions
+    public class GeneralChatFunctions
     {
         public List<User> Clients;
         public ConsoleDisplayer ConsoleDisplayer;
         public Dictionary<Guid, List<User>> UsersInChats;
-        public GlobalChatFunctions(Dictionary<Guid, List<User>> usersInChats, List<User> clients)
+        public List<User> ActiveUsersInChat { get; set; }
+        public GeneralChatFunctions(Dictionary<Guid, List<User>> usersInChats, List<User> clients)
         {
             UsersInChats = usersInChats;
             Clients = clients;
@@ -41,7 +42,7 @@ namespace ChatServer.ChatManagers
             }
             else
             {
-                UsersInChats[chatId].Remove(user);
+                ActiveUsersInChat.Remove(user);
             }
         }
 

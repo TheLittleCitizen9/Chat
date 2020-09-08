@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 
 namespace ChatClient.Chats
 {
@@ -12,29 +9,6 @@ namespace ChatClient.Chats
             : base(bytes, tcpClient, consoleDisplayer)
         {
 
-        }
-
-        public override void ShowOptions()
-        {
-            Dictionary<string, string> options = new Dictionary<string, string>();
-            options.Add("return", "return to main menu");
-            options.Add("exit", "exit program");
-            _consoleDisplayer.PrintMenu(options);
-        }
-
-        public void WriteMessage()
-        {
-            while (true)
-            {
-                _consoleDisplayer.PrintValueToConsole("Enter message to send");
-                string message = Console.ReadLine();
-                if (message == "return")
-                {
-                    base.WriteMessage(message);
-                    break;
-                }
-                base.WriteMessage(message);
-            }
         }
 
         public override void Run()

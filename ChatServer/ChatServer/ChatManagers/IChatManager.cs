@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChatServer.ChatManagers
 {
     public interface IChatManager
     {
-        public User SecondUser { get; set; }
+        public List<User> OtherUsersInChat { get; set; }
         void RemoveClientFromReceivingMessages(User user);
         void EnterUserToChat(User user);
 

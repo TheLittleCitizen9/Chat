@@ -8,15 +8,18 @@ namespace ChatServer.ChatManagers
     public class PrivateChatManager : IChatManager
     {
         public List<User> UsersInChat;
-        public GlobalChatFunctions ChatFunctions;
-        public User SecondUser { get; set; }
+        public GeneralChatFunctions ChatFunctions;
+        public List<User> OtherUsersInChat { get; set; }
+
         private Chat _chat;
 
-        public PrivateChatManager(GlobalChatFunctions chatFunctions, Chat chat)
+        public PrivateChatManager(GeneralChatFunctions chatFunctions, Chat chat)
         {
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
+            ChatFunctions.ActiveUsersInChat = UsersInChat;
             _chat = chat;
+            OtherUsersInChat = new List<User>();
         }
 
         public void ChatWithClient(User user)

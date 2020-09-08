@@ -9,17 +9,17 @@ namespace ChatServer
 {
     public class Server
     {
+        private const string IP = "10.1.0.17";
         private List<User> _clients;
         private int _port;
         private TcpListener _server;
-        private const string IP = "10.1.0.17";
         private ConsoleDisplayer _consoleDisplayer;
         private int _counter = 0;
         private Guid _globalChatId = Guid.NewGuid();
         private Dictionary<Guid, List<User>> _usersInChats;
         private List<Chat> _allChats;
         private GlobalChatManager _globalChatManager;
-        private GlobalChatFunctions _chatFunctions;
+        private GeneralChatFunctions _chatFunctions;
         private object _lock = new object();
         private List<IChatManager> _allChatManagers;
         private ClientHandler _clientHandler;
@@ -29,7 +29,7 @@ namespace ChatServer
             _clients = new List<User>();
             _consoleDisplayer = new ConsoleDisplayer();
             _usersInChats = new Dictionary<Guid, List<User>>();
-            _chatFunctions = new GlobalChatFunctions(_usersInChats, _clients);
+            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients);
             _globalChatManager = new GlobalChatManager(_globalChatId, _chatFunctions);
             _allChats = new List<Chat>();
             _allChatManagers = new List<IChatManager>();
@@ -40,6 +40,7 @@ namespace ChatServer
         {
             CreateServerSocket();
             _usersInChats[_globalChatId] = _globalChatManager.UsersInChat;
+            _allChatManagers.Add(_globalChatManager);
             while (true)
             {
                 var clientSocket = _server.AcceptTcpClient();
@@ -87,20 +88,10 @@ namespace ChatServer
 
         private void EnterGlobalChat(User user)
         {
-            if (user.NumbChatIds.Contains(_globalChatId))
-            {
-                _globalChatManager.EnterUserToGlobalChat(user);
-            }
-            else
-            {
-                //lock(_lock)
-                //{
-                //    _clients.Add(user);
-                //}
-                _globalChatManager.EnterUserToGlobalChat(user);
-            }
+            _globalChatManager.OtherUsersInChat.Add(user);
+            _globalChatManager.EnterUserToChat(user);
         }
-        private void EnterUserToChat(User user, Guid id)
+        private void EnterUserToPrivateChat(User user, Guid id)
         {
             bool canSend = SendAllClientsConnected(user);
             if (canSend)
@@ -112,17 +103,22 @@ namespace ChatServer
                     _usersInChats[id] = new List<User>() { user };
                     if (secondUser != null)
                     {
-                        Chat newPrivateChat = new Chat($"C{user.Id} + C{secondUser.Id}", id, ChatOptions.Private);
-                        _allChats.Add(newPrivateChat);
-                        _usersInChats[id].Add(secondUser);
-                        PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
-                        _allChatManagers.Add(privateChatManager);
-                        privateChatManager.SecondUser = secondUser;
-                        privateChatManager.AddChatToAllUsers(new List<User>() { secondUser });
-                        privateChatManager.EnterUserToChat(user);
+                        CreateNewPrivateChat(user, id, secondUser);
                     }
                 }
             }
+        }
+
+        private void CreateNewPrivateChat(User user, Guid id, User secondUser)
+        {
+            Chat newPrivateChat = new Chat($"C{user.Id} + C{secondUser.Id}", id, ChatOptions.Private);
+            _allChats.Add(newPrivateChat);
+            _usersInChats[id].Add(secondUser);
+            PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
+            _allChatManagers.Add(privateChatManager);
+            privateChatManager.OtherUsersInChat.Add(secondUser);
+            privateChatManager.AddChatToAllUsers(new List<User>() { secondUser });
+            privateChatManager.EnterUserToChat(user);
         }
 
         private bool CheckIfUserAlreadyHasPrivateChat(User user, User secondUser)
@@ -135,7 +131,8 @@ namespace ChatServer
                     {
                         foreach (var manager in _allChatManagers)
                         {
-                            if (manager.SecondUser == user)
+                            if (manager.OtherUsersInChat.Count == 1 && 
+                                (manager.OtherUsersInChat[0] == user || manager.OtherUsersInChat[0] == secondUser))
                             {
                                 manager.EnterUserToChat(user);
                                 return true;
@@ -148,19 +145,7 @@ namespace ChatServer
         }
         private void EnterPrivateChat(User user, Guid id)
         {
-            if(user.NumbChatIds.Contains(id))
-            {
-                EnterUserToChat(user, id);
-            }
-            else
-            {
-                //lock(_lock)
-                //{
-                //    _clients.Add(user);
-                //}
-                EnterUserToChat(user, id);
-            }
-            
+            EnterUserToPrivateChat(user, id);
         }
 
         private User FindUser(string id)

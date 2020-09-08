@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChatServer
+﻿namespace ChatServer
 {
     class Program
     {

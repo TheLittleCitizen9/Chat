@@ -5,18 +5,20 @@ using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class GlobalChatManager
+    public class GlobalChatManager : IChatManager
     {
         private Guid _globalChatId;
         public List<User> UsersInChat;
         private const string GLOBAL_CHAT_NAME = "Global";
-        public GlobalChatFunctions ChatFunctions;
+        public GeneralChatFunctions ChatFunctions;
+        public List<User> OtherUsersInChat { get; set; }
 
-        public GlobalChatManager(Guid id, GlobalChatFunctions chatFunctions)
+        public GlobalChatManager(Guid id, GeneralChatFunctions chatFunctions)
         {
             _globalChatId = id;
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
+            OtherUsersInChat = new List<User>();
         }
         public void ChatWithClientInGlobalChat(User user)
         {
@@ -57,7 +59,7 @@ namespace ChatServer.ChatManagers
             }
         }
 
-        public void EnterUserToGlobalChat(User user)
+        public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_globalChatId);
             user.AddChat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global);
@@ -67,7 +69,7 @@ namespace ChatServer.ChatManagers
             ChatWithClientInGlobalChat(user);
         }
 
-        private void RemoveClientFromReceivingMessages(User user)
+        public void RemoveClientFromReceivingMessages(User user)
         {
             user.AddNumbChatId(_globalChatId);
             ChatFunctions.RemoveClient(user, _globalChatId);

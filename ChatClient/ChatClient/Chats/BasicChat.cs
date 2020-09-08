@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -27,9 +28,12 @@ namespace ChatClient.Chats
 
         public virtual void ShowOptions()
         {
-
+            Dictionary<string, string> options = new Dictionary<string, string>();
+            options.Add("return", "return to main menu");
+            options.Add("exit", "exit program");
+            _consoleDisplayer.PrintMenu(options);
         }
-        public virtual void WriteMessage(string message)
+        public void WriteMessage(string message)
         {
             if (message == "exit")
             {
@@ -40,6 +44,21 @@ namespace ChatClient.Chats
                 NetworkStream nwStream = _client.TcpClient.GetStream();
                 byte[] messageToSend = Encoding.ASCII.GetBytes(message);
                 nwStream.Write(messageToSend);
+            }
+        }
+
+        public virtual void WriteMessage()
+        {
+            while (true)
+            {
+                _consoleDisplayer.PrintValueToConsole("Enter message to send");
+                string message = Console.ReadLine();
+                if (message == "return")
+                {
+                    WriteMessage(message);
+                    break;
+                }
+                WriteMessage(message);
             }
         }
 
