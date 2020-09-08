@@ -7,5 +7,10 @@ namespace BasicChatContents
     {
         public Guid ChatId { get; set; }
         public T MessageToSend { get; set; }
+
+        public override string ToString()
+        {
+            return MessageToSend.ToString();
+        }
     }
 }
