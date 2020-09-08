@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace ChatServer
+namespace ChatServer.Handlers
 {
     public class ClientHandler
     {

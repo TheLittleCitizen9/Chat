@@ -20,9 +20,10 @@ namespace ChatServer
         private List<Chat> _allChats;
         private GlobalChatManager _globalChatManager;
         private GeneralChatFunctions _chatFunctions;
-        private object _lock = new object();
         private List<IChatManager> _allChatManagers;
         private ClientHandler _clientHandler;
+        private PrivateChatHandler _privateChatHandler;
+        private GeneralHandler _generalHandler;
 
         public Server()
         {
@@ -34,6 +35,8 @@ namespace ChatServer
             _allChats = new List<Chat>();
             _allChatManagers = new List<IChatManager>();
             _clientHandler = new ClientHandler();
+            _generalHandler = new GeneralHandler(_clients, _clientHandler);
+            _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler);
         }
 
         public void StartListening()
@@ -91,101 +94,10 @@ namespace ChatServer
             _globalChatManager.OtherUsersInChat.Add(user);
             _globalChatManager.EnterUserToChat(user);
         }
-        private void EnterUserToPrivateChat(User user, Guid id)
-        {
-            bool canSend = SendAllClientsConnected(user);
-            if (canSend)
-            {
-                string clientId = _chatFunctions.GetDataFromClient(user);
-                var secondUser = FindUser(clientId);
-                if(!CheckIfUserAlreadyHasPrivateChat(user, secondUser))
-                {
-                    _usersInChats[id] = new List<User>() { user };
-                    if (secondUser != null)
-                    {
-                        CreateNewPrivateChat(user, id, secondUser);
-                    }
-                }
-            }
-        }
-
-        private void CreateNewPrivateChat(User user, Guid id, User secondUser)
-        {
-            Chat newPrivateChat = new Chat($"C{user.Id} + C{secondUser.Id}", id, ChatOptions.Private);
-            _allChats.Add(newPrivateChat);
-            _usersInChats[id].Add(secondUser);
-            PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
-            _allChatManagers.Add(privateChatManager);
-            privateChatManager.OtherUsersInChat.Add(secondUser);
-            privateChatManager.AddChatToAllUsers(new List<User>() { secondUser });
-            privateChatManager.EnterUserToChat(user);
-        }
-
-        private bool CheckIfUserAlreadyHasPrivateChat(User user, User secondUser)
-        {
-            foreach (KeyValuePair<Guid, List<User>> chat in _usersInChats)
-            {
-                if (chat.Value.Count == 2)
-                {
-                    if (chat.Value.Contains(user) && chat.Value.Contains(secondUser))
-                    {
-                        foreach (var manager in _allChatManagers)
-                        {
-                            if (manager.OtherUsersInChat.Count == 1 && 
-                                (manager.OtherUsersInChat[0] == user || manager.OtherUsersInChat[0] == secondUser))
-                            {
-                                manager.EnterUserToChat(user);
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
+        
         private void EnterPrivateChat(User user, Guid id)
         {
-            EnterUserToPrivateChat(user, id);
-        }
-
-        private User FindUser(string id)
-        {
-            User user = null;
-            int userId = int.Parse(id);
-            foreach (var client in _clients)
-            {
-                if(client.Id == userId)
-                {
-                    user = client;
-                }
-            }
-            return user;
-        }
-
-        private bool SendAllClientsConnected(User user)
-        {
-            string noConnectedClients = "No other users connected";
-            string allConnectedClients = string.Empty;
-            lock(_lock)
-            {
-                foreach (var client in _clients)
-                {
-                    if (client != user)
-                    {
-                        allConnectedClients += $"Client {client.Id},";
-                    }
-                }
-            }
-            if(string.IsNullOrEmpty(allConnectedClients))
-            {
-                _clientHandler.SendClientMessage(noConnectedClients, user);
-                return false;
-            }
-            else
-            {
-                _clientHandler.SendClientMessage(allConnectedClients, user);
-                return true;
-            }
+            _privateChatHandler.EnterUserToPrivateChat(user, id);
         }
 
         private void CreateServerSocket()
