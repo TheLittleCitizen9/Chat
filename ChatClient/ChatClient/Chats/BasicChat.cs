@@ -43,7 +43,7 @@ namespace ChatClient.Chats
             }
         }
 
-        public void ReadFromServer2()
+        public void GetMessagesFromServer()
         {
             while (true)
             {
@@ -51,12 +51,10 @@ namespace ChatClient.Chats
                 {
                     if (_client.GetStream().DataAvailable)
                     {
-                        Thread.Sleep(10);
-                        NetworkStream nwStream = _client.GetStream();
-                        nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
-                        string recieved = Encoding.ASCII.GetString(_bytesReceived);
+                        Thread.Sleep(15);
+                        string recievedData = GetDataFromClient();
 
-                        if (recieved.Replace("\0", string.Empty) != string.Empty)
+                        if (recievedData.Replace("\0", string.Empty) != string.Empty)
                         {
                             Thread processData = new Thread(() => PrintMessage(Encoding.ASCII.GetString(_bytesReceived)));
                             processData.Start();
@@ -77,38 +75,14 @@ namespace ChatClient.Chats
         {
             _consoleDisplayer.PrintValueToConsole(message);
         }
-        //public virtual void ReadFromServer()
-        //{
-        //    new Thread(() =>
-        //    {
-        //        Thread.CurrentThread.IsBackground = true;
-        //        while (true)
-        //        {
-        //            try
-        //            {
-        //                NetworkStream nwStream = _client.GetStream();
-        //                nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
-        //                string recieved = Encoding.ASCII.GetString(_bytesReceived);
-        //                if (recieved.Replace("\0", string.Empty) != string.Empty)
-        //                {
-        //                    _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
-        //                }
-        //            }
-        //            catch (IOException)
-        //            {
-        //                _consoleDisplayer.PrintValueToConsole($"Server disconnected");
-        //                Exit();
-        //            }
-        //        }
-        //    }).Start();
-        //}
+        
 
         public virtual void ReadFromServer()
         {
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                ReadFromServer2();
+                GetMessagesFromServer();
             }).Start();
         }
 
@@ -116,6 +90,13 @@ namespace ChatClient.Chats
         {
             _client.Close();
             Environment.Exit(0);
+        }
+
+        private string GetDataFromClient()
+        {
+            NetworkStream nwStream = _client.GetStream();
+            nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
+            return Encoding.ASCII.GetString(_bytesReceived);
         }
     }
 }
