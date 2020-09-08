@@ -34,6 +34,10 @@ namespace ChatClient
                 {
                     RegisterToGlobalChat();
                 }
+                else if(option == REGISTER_TO_PRIVATE_CHAT)
+                {
+
+                }
             }
         }
 
