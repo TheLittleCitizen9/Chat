@@ -12,6 +12,7 @@ namespace ChatServer
         public int Id;
         public List<Guid> ActiveChatIds;
         public List<Guid> NumbChatIds;
+        public List<Chat> AllChats;
 
         public User(TcpClient tcpClient, int id)
         {
@@ -20,6 +21,7 @@ namespace ChatServer
             Id = id;
             ActiveChatIds = new List<Guid>();
             NumbChatIds = new List<Guid>();
+            AllChats = new List<Chat>();
         }
 
         public void RemoveClient(TcpClient tcpClient)
@@ -47,6 +49,11 @@ namespace ChatServer
         {
             NumbChatIds.Add(id);
             ActiveChatIds.Remove(id);
+        }
+
+        public void AddChat(string name, Guid id, ChatOptions option)
+        {
+            AllChats.Add(new Chat(name, id, option));
         }
     }
 }

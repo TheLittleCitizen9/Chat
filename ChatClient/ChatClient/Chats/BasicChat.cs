@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace ChatClient.Chats
 {
-    public abstract class BasicChat
+    public class BasicChat
     {
         protected Byte[] _bytesReceived;
         protected TcpClient _client;
@@ -52,7 +52,7 @@ namespace ChatClient.Chats
                     if (_client.GetStream().DataAvailable)
                     {
                         Thread.Sleep(15);
-                        string recievedData = GetDataFromClient();
+                        string recievedData = GetDataFromServer();
 
                         if (recievedData.Replace("\0", string.Empty) != string.Empty)
                         {
@@ -92,7 +92,7 @@ namespace ChatClient.Chats
             Environment.Exit(0);
         }
 
-        private string GetDataFromClient()
+        private string GetDataFromServer()
         {
             NetworkStream nwStream = _client.GetStream();
             nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);

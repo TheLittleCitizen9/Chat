@@ -9,6 +9,7 @@ namespace ChatServer.ChatManagers
     {
         private Guid _globalChatId;
         public List<User> UsersInChat;
+        private const string GLOBAL_CHAT_NAME = "Global";
 
         public GlobalChatManager(Guid id, Dictionary<Guid, List<User>> usersInChats, List<User> clients)
             :base(usersInChats, clients)
@@ -58,6 +59,7 @@ namespace ChatServer.ChatManagers
         public void EnterUserToGlobalChat(User user)
         {
             user.AddActiveChatId(_globalChatId);
+            user.AddChat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToAllClients(clientConnectedMsg);

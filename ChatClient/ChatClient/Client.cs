@@ -1,6 +1,7 @@
 ﻿using ChatClient.Chats;
 using System;
 using System.Net.Sockets;
+using System.Text;
 
 namespace ChatClient
 {
@@ -36,6 +37,20 @@ namespace ChatClient
         public void ConnectToServer()
         {
             TcpClient = new TcpClient(Ip, Port);
+        }
+
+        public void SendMessageToServer(string message)
+        {
+            NetworkStream nwStream = TcpClient.GetStream();
+            byte[] messageToSend = Encoding.ASCII.GetBytes(message);
+            nwStream.Write(messageToSend);
+        }
+
+        public string GetMessageFromServer()
+        {
+            NetworkStream nwStream = TcpClient.GetStream();
+            nwStream.Read(BytesReceived, 0, BytesReceived.Length);
+            return Encoding.ASCII.GetString(BytesReceived);
         }
     }
 }

@@ -59,6 +59,14 @@ namespace ChatServer
                         {
                             EnterGlobalChat(user);
                         }
+                        else if ((ChatOptions)chatChoice == ChatOptions.Private)
+                        {
+                            //EnterGlobalChat(user);
+                        }
+                        else if ((ChatOptions)chatChoice == ChatOptions.SeeAll)
+                        {
+                            SendClientAllHisChats(user);
+                        }
                     }
                 }
             }
@@ -91,6 +99,18 @@ namespace ChatServer
             _server = new TcpListener(ipa, _port);
             _server.Start(100);
             _consoleDisplayer.PrintValueToConsole("Server started");
+        }
+
+        private void SendClientAllHisChats(User user)
+        {
+            string allChatsOfClient = string.Empty;
+            foreach (var chat in user.AllChats)
+            {
+                allChatsOfClient += $"{chat.Name}-{chat.ChatOption},";
+            }
+            byte[] data = Encoding.ASCII.GetBytes(allChatsOfClient);
+            NetworkStream nwStream = user.ClientSocket.GetStream();
+            nwStream.Write(data);
         }
     }
 }
