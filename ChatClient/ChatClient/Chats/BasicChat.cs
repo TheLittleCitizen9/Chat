@@ -9,11 +9,11 @@ namespace ChatClient.Chats
     public class BasicChat
     {
         protected Byte[] _bytesReceived;
-        protected TcpClient _client;
+        protected Client _client;
         protected ConsoleDisplayer _consoleDisplayer;
         protected CancellationTokenSource cancelationToken = new CancellationTokenSource();
 
-        public BasicChat(Byte[] bytes, TcpClient tcpClient, ConsoleDisplayer consoleDisplayer)
+        public BasicChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
         {
             _bytesReceived = bytes;
             _client = tcpClient;
@@ -37,7 +37,7 @@ namespace ChatClient.Chats
             }
             else
             {
-                NetworkStream nwStream = _client.GetStream();
+                NetworkStream nwStream = _client.TcpClient.GetStream();
                 byte[] messageToSend = Encoding.ASCII.GetBytes(message);
                 nwStream.Write(messageToSend);
             }
@@ -49,7 +49,7 @@ namespace ChatClient.Chats
             {
                 try
                 {
-                    if (_client.GetStream().DataAvailable)
+                    if (_client.TcpClient.GetStream().DataAvailable)
                     {
                         Thread.Sleep(15);
                         string recievedData = GetDataFromServer();
@@ -88,13 +88,13 @@ namespace ChatClient.Chats
 
         public void Exit()
         {
-            _client.Close();
+            _client.TcpClient.Close();
             Environment.Exit(0);
         }
 
         private string GetDataFromServer()
         {
-            NetworkStream nwStream = _client.GetStream();
+            NetworkStream nwStream = _client.TcpClient.GetStream();
             nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
             return Encoding.ASCII.GetString(_bytesReceived);
         }

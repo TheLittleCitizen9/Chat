@@ -6,7 +6,7 @@ namespace ChatClient.Chats
 {
     public class GlobalChat : BasicChat
     {
-        public GlobalChat(Byte[] bytes, TcpClient tcpClient, ConsoleDisplayer consoleDisplayer) 
+        public GlobalChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer) 
             :base(bytes, tcpClient, consoleDisplayer)
         {
 

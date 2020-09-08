@@ -37,7 +37,7 @@ namespace ChatClient
                 }
                 else if(option == REGISTER_TO_PRIVATE_CHAT)
                 {
-
+                    RegisterToPrivateChat();
                 }
                 else if (option == GET_ALL_CHATS)
                 {
@@ -48,7 +48,7 @@ namespace ChatClient
 
         private void RegisterToGlobalChat()
         {
-            _client.CurrentChat = new GlobalChat(_client.BytesReceived, _client.TcpClient, _client.ConsoleDisplayer);
+            _client.CurrentChat = new GlobalChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
             _client.CurrentChat.WriteMessage(REGISTER_TO_GLOBAL_CHAT);
             _client.CurrentChat.ShowOptions();
             _client.CurrentChat.ReadFromServer();
@@ -71,6 +71,14 @@ namespace ChatClient
             {
                 _consoleDisplayer.PrintValueToConsole("You have no chats");
             }
+        }
+
+        private void RegisterToPrivateChat()
+        {
+            _client.CurrentChat = new PrivateChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
+            _client.CurrentChat.WriteMessage(REGISTER_TO_PRIVATE_CHAT);
+            _client.CurrentChat.ShowOptions();
+            _client.CurrentChat.Run();
         }
     }
 }
