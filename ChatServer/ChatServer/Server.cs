@@ -87,12 +87,9 @@ namespace ChatServer
             IPAddress ipa = IPAddress.Parse(IP);
             _consoleDisplayer.PrintValueToConsole("Enter PORT");
             _port = int.Parse(Console.ReadLine());
-            IPEndPoint ipe = new IPEndPoint(ipa, _port);
 
             _server = new TcpListener(ipa, _port);
-
             _server.Start(100);
-
             _consoleDisplayer.PrintValueToConsole("Server started");
         }
     }

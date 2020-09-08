@@ -26,9 +26,7 @@ namespace ChatServer.ChatManagers
                     string noNullValuesData = dataFromClient.Replace("\0", string.Empty);
                     if (noNullValuesData == "return")
                     {
-                        user.AddNumbChatId(_globalChatId);
-                        RemoveClient(user, _globalChatId);
-                        SendMessageToAllClients($"Client {user.Id} left chat");
+                        RemoveClientFromReceivingMessages(user);
                         break;
                     }
                     string messageToClients = $"Client {user.Id} - {dataFromClient}";
@@ -64,6 +62,13 @@ namespace ChatServer.ChatManagers
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToAllClients(clientConnectedMsg);
             ChatWithClientInGlobalChat(user);
+        }
+
+        private void RemoveClientFromReceivingMessages(User user)
+        {
+            user.AddNumbChatId(_globalChatId);
+            RemoveClient(user, _globalChatId);
+            SendMessageToAllClients($"Client {user.Id} left chat");
         }
     }
 }
