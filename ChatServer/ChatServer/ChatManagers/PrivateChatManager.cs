@@ -5,20 +5,21 @@ using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class GlobalChatManager
+    public class PrivateChatManager : IChatManager
     {
-        private Guid _globalChatId;
         public List<User> UsersInChat;
-        private const string GLOBAL_CHAT_NAME = "Global";
         public GlobalChatFunctions ChatFunctions;
+        public User SecondUser { get; set; }
+        private Chat _chat;
 
-        public GlobalChatManager(Guid id, GlobalChatFunctions chatFunctions)
+        public PrivateChatManager(GlobalChatFunctions chatFunctions, Chat chat)
         {
-            _globalChatId = id;
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
+            _chat = chat;
         }
-        public void ChatWithClientInGlobalChat(User user)
+
+        public void ChatWithClient(User user)
         {
             try
             {
@@ -32,7 +33,7 @@ namespace ChatServer.ChatManagers
                         break;
                     }
                     string messageToClients = $"Client {user.Id} - {dataFromClient}";
-                    SendMessageToAllClients(messageToClients);
+                    SendMessageToClients(messageToClients);
                 }
             }
             catch (Exception)
@@ -40,7 +41,7 @@ namespace ChatServer.ChatManagers
                 ChatFunctions.DisconnectClient(user);
             }
         }
-        public void SendMessageToAllClients(string dataToSend)
+        public void SendMessageToClients(string dataToSend)
         {
             byte[] data = Encoding.ASCII.GetBytes(dataToSend);
             foreach (var client in UsersInChat)
@@ -57,21 +58,30 @@ namespace ChatServer.ChatManagers
             }
         }
 
-        public void EnterUserToGlobalChat(User user)
+        public void EnterUserToChat(User user)
         {
-            user.AddActiveChatId(_globalChatId);
-            user.AddChat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global);
+            user.AddActiveChatId(_chat.Id);
+            user.AddChat(_chat.Name, _chat.Id, ChatOptions.Private);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
-            SendMessageToAllClients(clientConnectedMsg);
-            ChatWithClientInGlobalChat(user);
+            SendMessageToClients(clientConnectedMsg);
+            ChatWithClient(user);
         }
 
-        private void RemoveClientFromReceivingMessages(User user)
+        public void RemoveClientFromReceivingMessages(User user)
         {
-            user.AddNumbChatId(_globalChatId);
-            ChatFunctions.RemoveClient(user, _globalChatId);
-            SendMessageToAllClients($"Client {user.Id} left chat");
+            user.AddNumbChatId(_chat.Id);
+            ChatFunctions.RemoveClient(user, _chat.Id);
+            SendMessageToClients($"Client {user.Id} left chat");
+        }
+
+        public void AddChatToAllUsers(List<User> users)
+        {
+            foreach (var user in users)
+            {
+                user.NumbChatIds.Add(_chat.Id);
+                user.AllChats.Add(_chat);
+            }
         }
     }
 }

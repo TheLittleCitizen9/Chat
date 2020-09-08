@@ -7,6 +7,7 @@ namespace ChatClient.Chats
 {
     public class PrivateChat : BasicChat
     {
+        private const string NO_OTHER_USERS_CONNECTED = "No other users connected";
         public PrivateChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
             : base(bytes, tcpClient, consoleDisplayer)
         {
@@ -47,16 +48,23 @@ namespace ChatClient.Chats
         public void ChooseClientToTalkTo(string allClientsConnected)
         {
             string[] allClients = allClientsConnected.Split(',');
-            PrintClientsConnected(allClients);
-            _consoleDisplayer.PrintValueToConsole("Enter client ID to talk to");
-            string id = Console.ReadLine();
-            if(ValidateId(id, allClients))
+            if(allClients[0].Replace("\0", string.Empty) != NO_OTHER_USERS_CONNECTED)
             {
-                SendServerClientId(id);
+                PrintClientsConnected(allClients);
+                _consoleDisplayer.PrintValueToConsole("Enter client ID to talk to");
+                string id = Console.ReadLine();
+                if (ValidateId(id, allClients))
+                {
+                    SendServerClientId(id);
+                }
+                else
+                {
+                    _consoleDisplayer.PrintValueToConsole("Please enter a valid id");
+                }
             }
             else
             {
-                _consoleDisplayer.PrintValueToConsole("Please enter a valid id");
+                _consoleDisplayer.PrintValueToConsole("Please choose a different option - there are no other users connected");
             }
         }
 

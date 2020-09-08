@@ -5,16 +5,16 @@ using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class BasicChatManager
+    public class GlobalChatFunctions
     {
-        protected List<User> _clients;
-        protected ConsoleDisplayer _consoleDisplayer;
-        protected Dictionary<Guid, List<User>> _usersInChats;
-        public BasicChatManager(Dictionary<Guid, List<User>> usersInChats, List<User> clients)
+        public List<User> Clients;
+        public ConsoleDisplayer ConsoleDisplayer;
+        public Dictionary<Guid, List<User>> UsersInChats;
+        public GlobalChatFunctions(Dictionary<Guid, List<User>> usersInChats, List<User> clients)
         {
-            _usersInChats = usersInChats;
-            _clients = clients;
-            _consoleDisplayer = new ConsoleDisplayer();
+            UsersInChats = usersInChats;
+            Clients = clients;
+            ConsoleDisplayer = new ConsoleDisplayer();
         }
         public string GetDataFromClient(User user)
         {
@@ -27,8 +27,8 @@ namespace ChatServer.ChatManagers
 
         public string DisconnectClient(User user)
         {
-            string clientDisconnectedMsg = $"Client {user.ClientSocket.Client.RemoteEndPoint} disconnected";
-            _consoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
+            string clientDisconnectedMsg = $"Client {user.Id} disconnected";
+            ConsoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
             RemoveClient(user);
             return clientDisconnectedMsg;
         }
@@ -41,14 +41,14 @@ namespace ChatServer.ChatManagers
             }
             else
             {
-                _usersInChats[chatId].Remove(user);
+                UsersInChats[chatId].Remove(user);
             }
         }
 
         private void RemoveUserFromAllChats(User user)
         {
-            _clients.Remove(user);
-            foreach (KeyValuePair<Guid, List<User>> pair in _usersInChats)
+            Clients.Remove(user);
+            foreach (KeyValuePair<Guid, List<User>> pair in UsersInChats)
             {
                 foreach (var usr in pair.Value)
                 {
