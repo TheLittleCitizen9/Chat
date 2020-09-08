@@ -11,7 +11,7 @@ namespace ChatServer
         public List<TcpClient> ClientsInChatWith;
         public int Id;
         public List<Guid> ActiveChatIds;
-        public List<Guid> InactiveChatIds;
+        public List<Guid> NumbChatIds;
 
         public User(TcpClient tcpClient, int id)
         {
@@ -19,7 +19,7 @@ namespace ChatServer
             ClientsInChatWith = new List<TcpClient>();
             Id = id;
             ActiveChatIds = new List<Guid>();
-            InactiveChatIds = new List<Guid>();
+            NumbChatIds = new List<Guid>();
         }
 
         public void RemoveClient(TcpClient tcpClient)
@@ -32,10 +32,10 @@ namespace ChatServer
 
         public void AddActiveChatId(Guid id)
         {
-            if(InactiveChatIds.Contains(id))
+            if(NumbChatIds.Contains(id))
             {
                 ActiveChatIds.Add(id);
-                InactiveChatIds.Remove(id);
+                NumbChatIds.Remove(id);
             }
             else
             {
@@ -45,7 +45,7 @@ namespace ChatServer
 
         public void AddNumbChatId(Guid id)
         {
-            InactiveChatIds.Add(id);
+            NumbChatIds.Add(id);
             ActiveChatIds.Remove(id);
         }
     }

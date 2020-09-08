@@ -71,7 +71,7 @@ namespace ChatServer
 
         private void EnterGlobalChat(User user)
         {
-            if (user.InactiveChatIds.Contains(_globalChatId))
+            if (user.NumbChatIds.Contains(_globalChatId))
             {
                 _globalChatManager.EnterUserToGlobalChat(user);
             }

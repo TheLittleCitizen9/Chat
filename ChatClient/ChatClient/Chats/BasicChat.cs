@@ -1,11 +1,8 @@
-﻿using BasicChatContents;
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChatClient.Chats
 {
@@ -40,28 +37,10 @@ namespace ChatClient.Chats
             }
             else
             {
-                Message<string> message2 = new Message<string>();
-                message2.MessageToSend = message;
-                message2.ChatId = Guid.Empty;
-                SendMessageToClient(message2);
-                //NetworkStream nwStream = _client.GetStream();
-                //byte[] messageToSend = Encoding.ASCII.GetBytes(message);
-                //nwStream.Write(messageToSend);
+                NetworkStream nwStream = _client.GetStream();
+                byte[] messageToSend = Encoding.ASCII.GetBytes(message);
+                nwStream.Write(messageToSend);
             }
-        }
-
-        private void SendMessageToClient(Message<string> message)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            NetworkStream nwStream = _client.GetStream();
-
-            MemoryStream ms = new MemoryStream();
-
-            bf.Serialize(ms, message);
-
-            byte[] data = ms.ToArray();
-
-            nwStream.Write(data);
         }
 
         public void ReadFromServer2()
