@@ -8,6 +8,7 @@ namespace ChatClient
         {
             Dictionary<string, string> options = new Dictionary<string, string>();
             options.Add("1", "Global chat");
+            options.Add("2", "Private chat");
             ClientManager clientManager = new ClientManager(options);
             clientManager.InitializeClient();
             clientManager.NavigateToChoice();

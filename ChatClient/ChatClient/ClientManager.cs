@@ -7,6 +7,7 @@ namespace ChatClient
     public class ClientManager
     {
         private const string REGISTER_TO_GLOBAL_CHAT = "1";
+        private const string REGISTER_TO_PRIVATE_CHAT = "2";
         private Dictionary<string, string> _dispalyOptions;
         private ConsoleDisplayer _consoleDisplayer;
         private Client _client;
