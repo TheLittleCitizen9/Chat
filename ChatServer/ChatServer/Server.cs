@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatServer.ChatManagers;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -17,79 +18,68 @@ namespace ChatServer
         private const string IP = "10.1.0.17";
         private ConsoleDisplayer _consoleDisplayer;
         private int _counter = 0;
+        private Guid _globalChatId = Guid.NewGuid();
+        private Dictionary<Guid, List<User>> _usersInChats;
+        private GlobalChatManager _globalChatManager;
 
         public Server()
         {
             _clients = new List<User>();
             _consoleDisplayer = new ConsoleDisplayer();
+            _usersInChats = new Dictionary<Guid, List<User>>();
+            _globalChatManager = new GlobalChatManager(_globalChatId, _usersInChats, _clients);
         }
 
         public void StartListening()
         {
             CreateServerSocket();
+            _usersInChats[_globalChatId] = _globalChatManager.UsersInChat;
             while (true)
             {
                 var clientSocket = _server.AcceptTcpClient();
                 _counter++;
                 var user = new User(clientSocket, _counter);
-                _clients.Add(user);
-                string clientConnectedMsg = $"Client {user.Id} connected";
-                SendToClients(clientConnectedMsg);
-                Task task = new Task(() => ChatWithClient(user));
+                _consoleDisplayer.PrintValueToConsole($"Client {user.Id} connected");
+                Task task = new Task(() => MapCientsChatChoice(user));
                 task.Start();
             }
         }
 
-        public void ChatWithClient(User user)
+        private void MapCientsChatChoice(User user)
         {
             try
             {
                 while (true)
                 {
-                    //check what kind of chat the user wants
-                    byte[] buffer = new byte[1024];
-                    NetworkStream nwStream = user.ClientSocket.GetStream();
-                    int bytesRecieved = nwStream.Read(buffer);
-                    string stringData = Encoding.ASCII.GetString(buffer);
-                    //need to check the stringData for return value
-                    string messageToClients = $"Client {user.Id} - {stringData}";
-                    SendToClients(messageToClients);
+                    string clientChatChoice = _globalChatManager.GetDataFromClient(user);
+                    object chatChoice;
+                    if (Enum.TryParse(typeof(ChatOptions), clientChatChoice, out chatChoice))
+                    {
+                        if ((ChatOptions)chatChoice == ChatOptions.Global)
+                        {
+                            EnterGlobalChat(user);
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
-                DisconnectClient(user);
+
+                _consoleDisplayer.PrintValueToConsole(e.Message);
             }
         }
 
-        public void SendToClients(string dataToSend)
+        private void EnterGlobalChat(User user)
         {
-            byte[] data = Encoding.ASCII.GetBytes(dataToSend);
-            foreach (var client in _clients)
+            if (user.NumbChatIds.Contains(_globalChatId))
             {
-                try
-                {
-                    NetworkStream nwStream = client.ClientSocket.GetStream();
-                    nwStream.Write(data);
-                }
-                catch (Exception e)
-                {
-                    _consoleDisplayer.PrintValueToConsole(e.Message);
-                }
+                _globalChatManager.EnterUserToGlobalChat(user);
             }
-        }
-
-        private void DisconnectClient(User user)
-        {
-            string clientDisconnectedMsg = $"Client {user.ClientSocket.Client.RemoteEndPoint} disconnected";
-            _consoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
-            RemoveClient(user);
-            SendToClients(clientDisconnectedMsg);
-        }
-
-        private void RemoveClient(User user)
-        {
-            _clients.Remove(user);
+            else
+            {
+                _clients.Add(user);
+                _globalChatManager.EnterUserToGlobalChat(user);
+            }
         }
 
         private void CreateServerSocket()
