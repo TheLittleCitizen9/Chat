@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChatClient.Chats
@@ -11,6 +12,7 @@ namespace ChatClient.Chats
         protected Byte[] _bytesReceived;
         protected TcpClient _client;
         protected ConsoleDisplayer _consoleDisplayer;
+        protected CancellationTokenSource cancelationToken = new CancellationTokenSource();
 
         public BasicChat(Byte[] bytes, TcpClient tcpClient, ConsoleDisplayer consoleDisplayer)
         {
@@ -41,28 +43,77 @@ namespace ChatClient.Chats
                 nwStream.Write(messageToSend);
             }
         }
-        public virtual void ReadFromServer()
+
+        public void ReadFromServer2()
         {
-            Task.Run(() =>
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
+                    if (_client.GetStream().DataAvailable)
                     {
+                        Thread.Sleep(10);
                         NetworkStream nwStream = _client.GetStream();
                         nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
-                        _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
-                    }
-                    catch (IOException e)
-                    {
-                        _consoleDisplayer.PrintValueToConsole($"Server disconnected");
-                        Exit();
+                        string recieved = Encoding.ASCII.GetString(_bytesReceived);
+
+                        if (recieved.Replace("\0", string.Empty) != string.Empty)
+                        {
+                            Thread processData = new Thread(() => PrintMessage(Encoding.ASCII.GetString(_bytesReceived)));
+                            processData.Start();
+                        }
                     }
                 }
-            });
+                catch (IOException)
+                {
+                    _consoleDisplayer.PrintValueToConsole("Server disconnected");
+                    Exit();
+                }
+
+                Thread.Sleep(5);
+            }
         }
 
-        private void Exit()
+        public void PrintMessage(string message)
+        {
+            _consoleDisplayer.PrintValueToConsole(message);
+        }
+        //public virtual void ReadFromServer()
+        //{
+        //    new Thread(() =>
+        //    {
+        //        Thread.CurrentThread.IsBackground = true;
+        //        while (true)
+        //        {
+        //            try
+        //            {
+        //                NetworkStream nwStream = _client.GetStream();
+        //                nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
+        //                string recieved = Encoding.ASCII.GetString(_bytesReceived);
+        //                if (recieved.Replace("\0", string.Empty) != string.Empty)
+        //                {
+        //                    _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
+        //                }
+        //            }
+        //            catch (IOException)
+        //            {
+        //                _consoleDisplayer.PrintValueToConsole($"Server disconnected");
+        //                Exit();
+        //            }
+        //        }
+        //    }).Start();
+        //}
+
+        public virtual void ReadFromServer()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                ReadFromServer2();
+            }).Start();
+        }
+
+        public void Exit()
         {
             _client.Close();
             Environment.Exit(0);
