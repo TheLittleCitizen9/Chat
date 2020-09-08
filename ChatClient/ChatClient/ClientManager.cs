@@ -6,6 +6,7 @@ namespace ChatClient
 {
     public class ClientManager
     {
+        private const string REGISTER_TO_GLOBAL_CHAT = "1";
         private Dictionary<string, string> _dispalyOptions;
         private ConsoleDisplayer _consoleDisplayer;
         private Client _client;
@@ -28,13 +29,20 @@ namespace ChatClient
             {
                 _consoleDisplayer.PrintMenu(_dispalyOptions);
                 string option = Console.ReadLine();
-                if (option == "1")
+                if (option == REGISTER_TO_GLOBAL_CHAT)
                 {
-                    _client.CurrentChat = new GlobalChat(_client.BytesReceived, _client.TcpClient, _client.ConsoleDisplayer);
-                    _client.CurrentChat.ShowOptions();
-                    _client.CurrentChat.Run();
+                    RegisterToGlobalChat();
                 }
             }
+        }
+
+        private void RegisterToGlobalChat()
+        {
+            _client.CurrentChat = new GlobalChat(_client.BytesReceived, _client.TcpClient, _client.ConsoleDisplayer);
+            _client.CurrentChat.WriteMessage(REGISTER_TO_GLOBAL_CHAT);
+            _client.CurrentChat.ShowOptions();
+            _client.CurrentChat.ReadFromServer();
+            _client.CurrentChat.Run();
         }
     }
 }
