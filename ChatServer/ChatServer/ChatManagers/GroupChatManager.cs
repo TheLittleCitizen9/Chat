@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class PrivateChatManager : IChatManager
+    public class GroupChatManager : IChatManager
     {
         public List<User> UsersInChat;
         public GeneralChatFunctions ChatFunctions;
@@ -14,7 +14,7 @@ namespace ChatServer.ChatManagers
 
         private Chat _chat;
 
-        public PrivateChatManager(GeneralChatFunctions chatFunctions, Chat chat)
+        public GroupChatManager(GeneralChatFunctions chatFunctions, Chat chat)
         {
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
@@ -65,7 +65,7 @@ namespace ChatServer.ChatManagers
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_chat.Id);
-            user.AddChat(_chat.Name, _chat.Id, ChatOptions.Private);
+            user.AddChat(_chat.Name, _chat.Id, ChatOptions.Group);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);

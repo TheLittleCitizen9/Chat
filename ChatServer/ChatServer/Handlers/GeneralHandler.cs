@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatServer.Handlers
 {
@@ -38,6 +39,19 @@ namespace ChatServer.Handlers
                 _clientHandler.SendClientMessage(allConnectedClients, user);
                 return true;
             }
+        }
+
+        public bool CheckIfAListContainsAnother(List<User> users, List<User> otherUsers)
+        {
+            if(!users.Equals(otherUsers))
+            {
+                var result = users.Intersect(otherUsers).ToList();
+                if(result.Count != users.Count)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatServer
+namespace ChatServer.Chats
 {
     public class Chat
     {

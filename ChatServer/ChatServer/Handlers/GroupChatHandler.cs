@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ChatServer.Handlers
 {
-    public class PrivateChatHandler
+    public class GroupChatHandler
     {
         private List<User> _clients;
         private Dictionary<Guid, List<User>> _usersInChats;
@@ -13,9 +13,9 @@ namespace ChatServer.Handlers
         private GeneralChatFunctions _chatFunctions;
         private List<IChatManager> _allChatManagers;
         private GeneralHandler _generalHandler;
-        
 
-        public PrivateChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats, 
+
+        public GroupChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats,
             List<IChatManager> allChatManagers, GeneralHandler generalHandler)
         {
             _clients = clients;
@@ -25,48 +25,53 @@ namespace ChatServer.Handlers
             _allChatManagers = allChatManagers;
             _generalHandler = generalHandler;
         }
+
         public void EnterUserToChat(User user, Guid id)
         {
             bool canSend = _generalHandler.SendAllClientsConnected(user);
             if (canSend)
             {
-                string clientId = _chatFunctions.GetDataFromClient(user);
-                var secondUser = FindUser(clientId);
-                if (!CheckIfUserAlreadyHasPrivateChat(user, secondUser))
+                string clientIds = _chatFunctions.GetDataFromClient(user);
+                var users = FindMultipleUsers(clientIds.Split(','));
+                if (!CheckIfUserAlreadyHasGroupChat(user, users))
                 {
                     _usersInChats[id] = new List<User>() { user };
-                    if (secondUser != null)
+                    if(users.Count > 0)
                     {
-                        CreateNewChat(user, id, secondUser);
+                        string chatName = _chatFunctions.GetDataFromClient(user);
+                        CreateNewChat(user, id, users, chatName);
                     }
                 }
             }
         }
 
-        public void CreateNewChat(User user, Guid id, User secondUser)
+        public void CreateNewChat(User user, Guid id, List<User> otherUsers, string chatName)
         {
-            Chat newPrivateChat = new Chat($"C{user.Id} + C{secondUser.Id}", id, ChatOptions.Private);
-            _allChats.Add(newPrivateChat);
-            _usersInChats[id].Add(secondUser);
-            PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
-            _allChatManagers.Add(privateChatManager);
-            privateChatManager.OtherUsersInChat.Add(secondUser);
-            privateChatManager.AddChatToAllUsers(new List<User>() { secondUser });
-            privateChatManager.EnterUserToChat(user);
+            GroupChat newGroupChat = new GroupChat($"C{chatName}", id, ChatOptions.Group);
+            newGroupChat.Admins.Add(user);
+            _allChats.Add(newGroupChat);
+            _usersInChats[id].AddRange(otherUsers);
+            GroupChatManager groupChatManager = new GroupChatManager(_chatFunctions, newGroupChat);
+            _allChatManagers.Add(groupChatManager);
+            groupChatManager.OtherUsersInChat.AddRange(otherUsers);
+            groupChatManager.AddChatToAllUsers(otherUsers);
+            groupChatManager.EnterUserToChat(user);
         }
 
-        public bool CheckIfUserAlreadyHasPrivateChat(User user, User secondUser)
+        public bool CheckIfUserAlreadyHasGroupChat(User user, List<User> otherUsers)
         {
+            var allUsersInChat = otherUsers;
+            allUsersInChat.Add(user);
             foreach (KeyValuePair<Guid, List<User>> chat in _usersInChats)
             {
-                if (chat.Value.Count == 2)
+                if (chat.Value.Count >= 2)
                 {
-                    if (chat.Value.Contains(user) && chat.Value.Contains(secondUser))
+                    if (chat.Value.Equals(allUsersInChat))
                     {
                         foreach (var manager in _allChatManagers)
                         {
-                            if (manager.OtherUsersInChat.Count == 1 &&
-                                (manager.OtherUsersInChat[0] == user || manager.OtherUsersInChat[0] == secondUser))
+                            if (manager.OtherUsersInChat.Count == otherUsers.Count && 
+                                _generalHandler.CheckIfAListContainsAnother(allUsersInChat, manager.OtherUsersInChat))
                             {
                                 manager.EnterUserToChat(user);
                                 return true;
@@ -76,6 +81,18 @@ namespace ChatServer.Handlers
                 }
             }
             return false;
+        }
+
+        private List<User> FindMultipleUsers(string[] userIds)
+        {
+            List<User> users = new List<User>();
+            foreach (var id in userIds)
+            {
+                var user = FindUser(id);
+                if (user != null)
+                    users.Add(user);
+            }
+            return users;
         }
 
         private User FindUser(string id)

@@ -1,4 +1,5 @@
 ﻿using ChatServer.ChatManagers;
+using ChatServer.Chats;
 using ChatServer.Handlers;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace ChatServer
         private ClientHandler _clientHandler;
         private PrivateChatHandler _privateChatHandler;
         private GeneralHandler _generalHandler;
+        private GroupChatHandler _groupChatHandler;
 
         public Server()
         {
@@ -38,6 +40,7 @@ namespace ChatServer
             _clientHandler = new ClientHandler();
             _generalHandler = new GeneralHandler(_clients, _clientHandler);
             _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler);
+            _groupChatHandler = new GroupChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler);
         }
 
         public void StartListening()
@@ -64,8 +67,7 @@ namespace ChatServer
                 while (true)
                 {
                     string clientChatChoice = _globalChatManager.ChatFunctions.GetDataFromClient(user);
-                    object chatChoice;
-                    if (Enum.TryParse(typeof(ChatOptions), clientChatChoice, out chatChoice))
+                    if (Enum.TryParse(typeof(ChatOptions), clientChatChoice, out object chatChoice))
                     {
                         if ((ChatOptions)chatChoice == ChatOptions.Global)
                         {
@@ -79,6 +81,11 @@ namespace ChatServer
                         else if ((ChatOptions)chatChoice == ChatOptions.SeeAll)
                         {
                             _clientHandler.SendClientAllHisChats(user);
+                        }
+                        else if ((ChatOptions)chatChoice == ChatOptions.Group)
+                        {
+                            Guid chatId = Guid.NewGuid();
+                            EnterGroupChat(user, chatId);
                         }
                     }
                 }
@@ -98,7 +105,12 @@ namespace ChatServer
         
         private void EnterPrivateChat(User user, Guid id)
         {
-            _privateChatHandler.EnterUserToPrivateChat(user, id);
+            _privateChatHandler.EnterUserToChat(user, id);
+        }
+
+        private void EnterGroupChat(User user, Guid id)
+        {
+            _groupChatHandler.EnterUserToChat(user, id);
         }
 
         private void CreateServerSocket()
