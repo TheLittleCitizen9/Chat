@@ -8,7 +8,7 @@ namespace ChatServer.ChatManagers
 {
     public class GroupChatManager : IChatManager
     {
-        public List<User> UsersInChat;
+        public List<User> UsersInChat { get; set; }
         public GeneralChatFunctions ChatFunctions;
         public List<User> OtherUsersInChat { get; set; }
 
