@@ -16,6 +16,7 @@ namespace ChatServer.ChatManagers
             UsersInChats = usersInChats;
             Clients = clients;
             ConsoleDisplayer = new ConsoleDisplayer();
+            ActiveUsersInChat = new List<User>();
         }
         public string GetDataFromClient(User user)
         {

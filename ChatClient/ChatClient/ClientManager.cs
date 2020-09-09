@@ -55,6 +55,13 @@ namespace ChatClient
             _client.CurrentChat.Run();
         }
 
+        private void RegisterToPrivateChat()
+        {
+            _client.CurrentChat = new PrivateChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
+            _client.CurrentChat.WriteMessage(REGISTER_TO_PRIVATE_CHAT);
+            _client.CurrentChat.Run();
+        }
+
         private void PrintAllChats()
         {
             _client.SendMessageToServer(GET_ALL_CHATS);
@@ -71,14 +78,6 @@ namespace ChatClient
             {
                 _consoleDisplayer.PrintValueToConsole("You have no chats");
             }
-        }
-
-        private void RegisterToPrivateChat()
-        {
-            _client.CurrentChat = new PrivateChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
-            _client.CurrentChat.WriteMessage(REGISTER_TO_PRIVATE_CHAT);
-            _client.CurrentChat.ShowOptions();
-            _client.CurrentChat.Run();
         }
     }
 }

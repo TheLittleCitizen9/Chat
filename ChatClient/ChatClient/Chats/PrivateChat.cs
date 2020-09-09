@@ -14,12 +14,15 @@ namespace ChatClient.Chats
         public override void Run()
         {
             string allClientsConnected = _client.GetMessageFromServer();
-            ChooseClientToTalkTo(allClientsConnected);
-            base.ReadFromServer();
-            WriteMessage();
+            if(ChooseClientToTalkTo(allClientsConnected))
+            {
+                base.ReadFromServer();
+                ShowOptions();
+                WriteMessage();
+            }
         }
 
-        public void ChooseClientToTalkTo(string allClientsConnected)
+        public bool ChooseClientToTalkTo(string allClientsConnected)
         {
             string[] allClients = allClientsConnected.Split(',');
             if(allClients[0].Replace("\0", string.Empty) != NO_OTHER_USERS_CONNECTED)
@@ -30,15 +33,18 @@ namespace ChatClient.Chats
                 if (ValidateId(id, allClients))
                 {
                     SendServerClientId(id);
+                    return true;
                 }
                 else
                 {
                     _consoleDisplayer.PrintValueToConsole("Please enter a valid id");
+                    return false;
                 }
             }
             else
             {
                 _consoleDisplayer.PrintValueToConsole("Please choose a different option - there are no other users connected");
+                return false;
             }
         }
 

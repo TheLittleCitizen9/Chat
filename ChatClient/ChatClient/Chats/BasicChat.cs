@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -80,8 +79,9 @@ namespace ChatClient.Chats
                         }
                     }
                 }
-                catch (IOException)
+                catch (Exception e)
                 {
+                    _consoleDisplayer.PrintValueToConsole(e.Message);
                     _consoleDisplayer.PrintValueToConsole("Server disconnected");
                     Exit();
                 }
