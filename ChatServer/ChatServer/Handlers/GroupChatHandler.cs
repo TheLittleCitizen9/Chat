@@ -2,6 +2,7 @@
 using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatServer.Handlers
 {
@@ -47,7 +48,7 @@ namespace ChatServer.Handlers
 
         public void CreateNewChat(User user, Guid id, List<User> otherUsers, string chatName)
         {
-            GroupChat newGroupChat = new GroupChat($"C{chatName}", id, ChatOptions.Group);
+            GroupChat newGroupChat = new GroupChat($"{chatName}", id, ChatOptions.Group);
             newGroupChat.Admins.Add(user);
             _allChats.Add(newGroupChat);
             _usersInChats[id].AddRange(otherUsers);
@@ -60,18 +61,21 @@ namespace ChatServer.Handlers
 
         public bool CheckIfUserAlreadyHasGroupChat(User user, List<User> otherUsers)
         {
-            var allUsersInChat = otherUsers;
+            var allUsersInChat = otherUsers.Select(u => u).ToList();
             allUsersInChat.Add(user);
             foreach (KeyValuePair<Guid, List<User>> chat in _usersInChats)
             {
                 if (chat.Value.Count >= 2)
                 {
-                    if (chat.Value.Equals(allUsersInChat))
+                    var firstNotSecond = chat.Value.Except(allUsersInChat).ToList();
+                    var secondNotFirst = allUsersInChat.Except(chat.Value).ToList();
+                    if (!firstNotSecond.Any() && !secondNotFirst.Any())
                     {
                         foreach (var manager in _allChatManagers)
                         {
                             if (manager.OtherUsersInChat.Count == otherUsers.Count && 
-                                _generalHandler.CheckIfAListContainsAnother(allUsersInChat, manager.OtherUsersInChat))
+                                (_generalHandler.CheckIfAListContainsAnother(otherUsers, manager.OtherUsersInChat) ||
+                                _generalHandler.CheckIfAListContainsAnother(otherUsers, manager.UsersInChat)))
                             {
                                 manager.EnterUserToChat(user);
                                 return true;
