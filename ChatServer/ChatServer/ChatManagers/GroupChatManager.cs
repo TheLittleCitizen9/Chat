@@ -129,6 +129,7 @@ namespace ChatServer.ChatManagers
                 userToRemove.AllChats.Remove(_chat);
                 _chat.Admins.Remove(userToRemove);
                 ChatFunctions.RemoveClientFromSpecificChat(userToRemove, _chat.Id);
+                RemoveClientFromReceivingMessages(userToRemove);
                 SendMessageToClients($"{userToRemove.Id} was removed from group");
             }
         }
@@ -141,6 +142,7 @@ namespace ChatServer.ChatManagers
             }
             UsersInChat.Remove(user);
             ChatFunctions.RemoveClientFromSpecificChat(user, _chat.Id);
+            RemoveClientFromReceivingMessages(user);
             SendMessageToClients($"{user.Id} left the group");
         }
     }

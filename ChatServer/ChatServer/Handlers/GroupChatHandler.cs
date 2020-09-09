@@ -74,8 +74,7 @@ namespace ChatServer.Handlers
                         foreach (var manager in _allChatManagers)
                         {
                             if (manager.OtherUsersInChat.Count == otherUsers.Count && 
-                                (_generalHandler.CheckIfAListContainsAnother(otherUsers, manager.OtherUsersInChat) ||
-                                _generalHandler.CheckIfAListContainsAnother(otherUsers, manager.UsersInChat)))
+                                (_generalHandler.CheckIfAListContainsAnother(otherUsers, manager.OtherUsersInChat, manager.UsersInChat)))
                             {
                                 manager.EnterUserToChat(user);
                                 return true;

@@ -16,11 +16,13 @@ namespace ChatServer.Handlers
             _clientHandler = clientHandler;
         }
         
-        public bool CheckIfAListContainsAnother(List<User> users, List<User> otherUsers)
+        public bool CheckIfAListContainsAnother(List<User> users, List<User> otherUsers, List<User> usersInChat)
         {
             if(!users.Equals(otherUsers))
             {
-                var result = users.Intersect(otherUsers).ToList();
+                var allUsersInChat = otherUsers.Select(u => u).ToList();
+                allUsersInChat.AddRange(usersInChat);
+                var result = users.Intersect(allUsersInChat).ToList();
                 if(result.Count != users.Count)
                 {
                     return false;

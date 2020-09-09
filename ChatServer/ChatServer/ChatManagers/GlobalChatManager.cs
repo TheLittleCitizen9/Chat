@@ -55,6 +55,7 @@ namespace ChatServer.ChatManagers
                 catch (Exception e)
                 {
                     ChatFunctions.ConsoleDisplayer.PrintValueToConsole(e.Message);
+                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole("CLient dissonnected");
                 }
             }
         }
