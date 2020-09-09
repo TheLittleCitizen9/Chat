@@ -46,7 +46,7 @@ namespace ChatClient
                 }
                 else if(option == CREATE_GROUP_CHAT)
                 {
-
+                    RegisterToGroupChat();
                 }
             }
         }
@@ -64,6 +64,13 @@ namespace ChatClient
         {
             _client.CurrentChat = new PrivateChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
             _client.CurrentChat.WriteMessage(REGISTER_TO_PRIVATE_CHAT);
+            _client.CurrentChat.Run();
+        }
+
+        private void RegisterToGroupChat()
+        {
+            _client.CurrentChat = new GroupChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
+            _client.CurrentChat.WriteMessage(CREATE_GROUP_CHAT);
             _client.CurrentChat.Run();
         }
 
