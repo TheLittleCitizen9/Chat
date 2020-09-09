@@ -20,7 +20,7 @@ namespace ChatServer.ChatManagers
             ChatFunctions = chatFunctions;
             OtherUsersInChat = new List<User>();
         }
-        public void ChatWithClientInGlobalChat(User user)
+        public void ChatWithClient(User user)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace ChatServer.ChatManagers
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToAllClients(clientConnectedMsg);
-            ChatWithClientInGlobalChat(user);
+            ChatWithClient(user);
         }
 
         public void RemoveClientFromReceivingMessages(User user)

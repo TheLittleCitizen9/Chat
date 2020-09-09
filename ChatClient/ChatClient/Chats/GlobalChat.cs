@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicChatContents;
+using System;
 
 namespace ChatClient.Chats
 {

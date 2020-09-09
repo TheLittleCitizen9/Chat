@@ -1,4 +1,5 @@
-﻿using ChatServer.ChatManagers;
+﻿using BasicChatContents;
+using ChatServer.ChatManagers;
 using ChatServer.Chats;
 using ChatServer.Handlers;
 using System;

@@ -1,4 +1,6 @@
-﻿using ChatServer.Handlers;
+﻿using BasicChatContents;
+using ChatServer.Chats;
+using ChatServer.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -27,7 +29,7 @@ namespace ChatServer.ChatManagers
         {
             byte[] buffer = new byte[1024];
             NetworkStream nwStream = user.ClientSocket.GetStream();
-            int bytesRecieved = nwStream.Read(buffer);
+            int bytesRecieved = nwStream.Read(buffer); 
             string stringData = Encoding.ASCII.GetString(buffer);
             return stringData;
         }
@@ -39,19 +41,6 @@ namespace ChatServer.ChatManagers
             RemoveClient(user);
             return clientDisconnectedMsg;
         }
-
-        public void RemoveClient(User user, Guid chatId = default)
-        {
-            if (chatId == default)
-            {
-                RemoveUserFromAllChats(user);
-            }
-            else
-            {
-                ActiveUsersInChat.Remove(user);
-            }
-        }
-
         public User FindUser(string id)
         {
             User user = null;
@@ -92,6 +81,25 @@ namespace ChatServer.ChatManagers
             }
         }
 
+        public void AddChatToAllUsers(List<User> users, Chat chat)
+        {
+            foreach (var user in users)
+            {
+                user.NumbChatIds.Add(chat.Id);
+                user.AllChats.Add(chat);
+            }
+        }
+        public void RemoveClient(User user, Guid chatId = default)
+        {
+            if (chatId == default)
+            {
+                RemoveUserFromAllChats(user);
+            }
+            else
+            {
+                ActiveUsersInChat.Remove(user);
+            }
+        }
         public void RemoveClientFromSpecificChat(User user, Guid chatId)
         {
             foreach (var usr in UsersInChats[chatId])

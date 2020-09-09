@@ -1,4 +1,5 @@
-﻿using ChatClient.Chats;
+﻿using BasicChatContents;
+using ChatClient.Chats;
 using System;
 using System.Collections.Generic;
 

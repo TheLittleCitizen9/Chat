@@ -51,7 +51,7 @@ namespace ChatServer.Handlers
             PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
             _allChatManagers.Add(privateChatManager);
             privateChatManager.OtherUsersInChat.Add(secondUser);
-            privateChatManager.AddChatToAllUsers(new List<User>() { secondUser });
+            _chatFunctions.AddChatToAllUsers(new List<User>() { secondUser }, newPrivateChat);
             privateChatManager.EnterUserToChat(user);
         }
 

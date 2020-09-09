@@ -55,7 +55,7 @@ namespace ChatServer.Handlers
             GroupChatManager groupChatManager = new GroupChatManager(_chatFunctions, newGroupChat);
             _allChatManagers.Add(groupChatManager);
             groupChatManager.OtherUsersInChat.AddRange(otherUsers);
-            groupChatManager.AddChatToAllUsers(otherUsers);
+            _chatFunctions.AddChatToAllUsers(otherUsers, newGroupChat);
             groupChatManager.EnterUserToChat(user);
         }
 

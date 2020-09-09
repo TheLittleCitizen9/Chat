@@ -1,15 +1,11 @@
 ﻿using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class PrivateChatManager : IChatManager
+    public class PrivateChatManager : BasicChat, IChatManager
     {
-        public List<User> UsersInChat { get; set; }
-        public GeneralChatFunctions ChatFunctions;
         public List<User> OtherUsersInChat { get; set; }
 
         private Chat _chat;
@@ -45,23 +41,6 @@ namespace ChatServer.ChatManagers
                 ChatFunctions.DisconnectClient(user);
             }
         }
-        public void SendMessageToClients(string dataToSend)
-        {
-            byte[] data = Encoding.ASCII.GetBytes(dataToSend);
-            foreach (var client in UsersInChat)
-            {
-                try
-                {
-                    NetworkStream nwStream = client.ClientSocket.GetStream();
-                    nwStream.Write(data);
-                }
-                catch (Exception e)
-                {
-                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole(e.Message);
-                }
-            }
-        }
-
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_chat.Id);
@@ -77,15 +56,6 @@ namespace ChatServer.ChatManagers
             user.AddNumbChatId(_chat.Id);
             ChatFunctions.RemoveClient(user, _chat.Id);
             SendMessageToClients($"Client {user.Id} left chat");
-        }
-
-        public void AddChatToAllUsers(List<User> users)
-        {
-            foreach (var user in users)
-            {
-                user.NumbChatIds.Add(_chat.Id);
-                user.AllChats.Add(_chat);
-            }
         }
     }
 }
