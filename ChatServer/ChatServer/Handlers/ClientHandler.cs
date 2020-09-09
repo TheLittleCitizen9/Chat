@@ -10,7 +10,7 @@ namespace ChatServer.Handlers
             string allChatsOfClient = string.Empty;
             foreach (var chat in user.AllChats)
             {
-                allChatsOfClient += $"{chat.Name}-{chat.ChatOption},";
+                allChatsOfClient += $"{chat.Name.Replace("\0", string.Empty)}-{chat.ChatOption},";
             }
             if (!string.IsNullOrEmpty(allChatsOfClient))
             {

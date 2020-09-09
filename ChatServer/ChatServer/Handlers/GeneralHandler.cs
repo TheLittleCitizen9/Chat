@@ -15,32 +15,7 @@ namespace ChatServer.Handlers
             _clients = clients;
             _clientHandler = clientHandler;
         }
-        public bool SendAllClientsConnected(User user)
-        {
-            string noConnectedClients = "No other users connected";
-            string allConnectedClients = string.Empty;
-            lock (_lock)
-            {
-                foreach (var client in _clients)
-                {
-                    if (client != user)
-                    {
-                        allConnectedClients += $"Client {client.Id},";
-                    }
-                }
-            }
-            if (string.IsNullOrEmpty(allConnectedClients))
-            {
-                _clientHandler.SendClientMessage(noConnectedClients, user);
-                return false;
-            }
-            else
-            {
-                _clientHandler.SendClientMessage(allConnectedClients, user);
-                return true;
-            }
-        }
-
+        
         public bool CheckIfAListContainsAnother(List<User> users, List<User> otherUsers)
         {
             if(!users.Equals(otherUsers))

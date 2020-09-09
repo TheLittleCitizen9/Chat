@@ -16,22 +16,22 @@ namespace ChatServer.Handlers
         
 
         public PrivateChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats, 
-            List<IChatManager> allChatManagers, GeneralHandler generalHandler)
+            List<IChatManager> allChatManagers, GeneralHandler generalHandler, ClientHandler clientHandler)
         {
             _clients = clients;
             _usersInChats = usersInChats;
-            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients);
+            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, clientHandler);
             _allChats = allChats;
             _allChatManagers = allChatManagers;
             _generalHandler = generalHandler;
         }
         public void EnterUserToChat(User user, Guid id)
         {
-            bool canSend = _generalHandler.SendAllClientsConnected(user);
+            bool canSend = _chatFunctions.SendAllClientsConnected(user);
             if (canSend)
             {
                 string clientId = _chatFunctions.GetDataFromClient(user);
-                var secondUser = FindUser(clientId);
+                var secondUser = _chatFunctions.FindUser(clientId);
                 if (!CheckIfUserAlreadyHasPrivateChat(user, secondUser))
                 {
                     _usersInChats[id] = new List<User>() { user };
@@ -76,20 +76,6 @@ namespace ChatServer.Handlers
                 }
             }
             return false;
-        }
-
-        private User FindUser(string id)
-        {
-            User user = null;
-            int userId = int.Parse(id);
-            foreach (var client in _clients)
-            {
-                if (client.Id == userId)
-                {
-                    user = client;
-                }
-            }
-            return user;
         }
     }
 }

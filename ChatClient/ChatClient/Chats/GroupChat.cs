@@ -25,6 +25,21 @@ namespace ChatClient.Chats
             }
         }
 
+        public override void WriteMessage()
+        {
+            while (true)
+            {
+                _consoleDisplayer.PrintValueToConsole("Enter message to send");
+                string message = Console.ReadLine();
+                if (message == "return" || message == "leave")
+                {
+                    WriteMessage(message);
+                    break;
+                }
+                WriteMessage(message);
+            }
+        }
+
         public bool ChooseClientToTalkTo(string allClientsConnected)
         {
             string[] allClients = allClientsConnected.Split(',');

@@ -17,11 +17,11 @@ namespace ChatServer.Handlers
 
 
         public GroupChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats,
-            List<IChatManager> allChatManagers, GeneralHandler generalHandler)
+            List<IChatManager> allChatManagers, GeneralHandler generalHandler, ClientHandler clientHandler)
         {
             _clients = clients;
             _usersInChats = usersInChats;
-            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients);
+            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, clientHandler);
             _allChats = allChats;
             _allChatManagers = allChatManagers;
             _generalHandler = generalHandler;
@@ -29,7 +29,7 @@ namespace ChatServer.Handlers
 
         public void EnterUserToChat(User user, Guid id)
         {
-            bool canSend = _generalHandler.SendAllClientsConnected(user);
+            bool canSend = _chatFunctions.SendAllClientsConnected(user);
             if (canSend)
             {
                 string clientIds = _chatFunctions.GetDataFromClient(user);
@@ -92,25 +92,11 @@ namespace ChatServer.Handlers
             List<User> users = new List<User>();
             foreach (var id in userIds)
             {
-                var user = FindUser(id);
+                var user = _chatFunctions.FindUser(id);
                 if (user != null)
                     users.Add(user);
             }
             return users;
-        }
-
-        private User FindUser(string id)
-        {
-            User user = null;
-            int userId = int.Parse(id);
-            foreach (var client in _clients)
-            {
-                if (client.Id == userId)
-                {
-                    user = client;
-                }
-            }
-            return user;
         }
     }
 }

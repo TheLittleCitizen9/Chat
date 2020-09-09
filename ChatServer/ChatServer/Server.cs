@@ -30,17 +30,17 @@ namespace ChatServer
 
         public Server()
         {
+            _clientHandler = new ClientHandler();
             _clients = new List<User>();
             _consoleDisplayer = new ConsoleDisplayer();
             _usersInChats = new Dictionary<Guid, List<User>>();
-            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients);
+            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, _clientHandler);
             _globalChatManager = new GlobalChatManager(_globalChatId, _chatFunctions);
             _allChats = new List<Chat>();
             _allChatManagers = new List<IChatManager>();
-            _clientHandler = new ClientHandler();
             _generalHandler = new GeneralHandler(_clients, _clientHandler);
-            _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler);
-            _groupChatHandler = new GroupChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler);
+            _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler, _clientHandler);
+            _groupChatHandler = new GroupChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler, _clientHandler);
         }
 
         public void StartListening()

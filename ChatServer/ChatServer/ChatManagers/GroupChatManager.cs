@@ -12,9 +12,13 @@ namespace ChatServer.ChatManagers
         public GeneralChatFunctions ChatFunctions;
         public List<User> OtherUsersInChat { get; set; }
 
-        private Chat _chat;
+        private GroupChat _chat;
+        private const string RETURN_TO_MENU = "return";
+        private const string ADD_ADMIN = "add admin";
+        private const string LEAVE_GROUP = "leave";
+        private const string REMOVE_USER = "remove";
 
-        public GroupChatManager(GeneralChatFunctions chatFunctions, Chat chat)
+        public GroupChatManager(GeneralChatFunctions chatFunctions, GroupChat chat)
         {
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
@@ -31,13 +35,28 @@ namespace ChatServer.ChatManagers
                 {
                     string dataFromClient = ChatFunctions.GetDataFromClient(user);
                     string noNullValuesData = dataFromClient.Replace("\0", string.Empty);
-                    if (noNullValuesData == "return")
+                    if (noNullValuesData == RETURN_TO_MENU)
                     {
                         RemoveClientFromReceivingMessages(user);
                         break;
                     }
-                    string messageToClients = $"Client {user.Id} - {dataFromClient}";
-                    SendMessageToClients(messageToClients);
+                    else if(noNullValuesData == ADD_ADMIN)
+                    {
+                        AddUserAsAdmin(user);
+                    }
+                    else if (noNullValuesData == REMOVE_USER)
+                    {
+                        RemoveUserFromGroup(user);
+                    }
+                    else if (noNullValuesData == LEAVE_GROUP)
+                    {
+                        LeaveGroup(user);
+                    }
+                    else
+                    {
+                        string messageToClients = $"Client {user.Id} - {dataFromClient}";
+                        SendMessageToClients(messageToClients);
+                    }
                 }
             }
             catch (Exception)
@@ -86,6 +105,43 @@ namespace ChatServer.ChatManagers
                 user.NumbChatIds.Add(_chat.Id);
                 user.AllChats.Add(_chat);
             }
+        }
+
+        public void AddUserAsAdmin(User user)
+        {
+            if (_chat.Admins.Contains(user))
+            {
+                ChatFunctions.SendAllClientsConnected(user);
+                string userId = ChatFunctions.GetDataFromClient(user);
+                var newAdmin = ChatFunctions.FindUser(userId);
+                _chat.Admins.Add(newAdmin);
+                SendMessageToClients($"{newAdmin.Id} is now an admin");
+            }
+        }
+
+        public void RemoveUserFromGroup(User user)
+        {
+            if (_chat.Admins.Contains(user))
+            {
+                ChatFunctions.SendAllClientsConnected(user);
+                string userId = ChatFunctions.GetDataFromClient(user);
+                var userToRemove = ChatFunctions.FindUser(userId);
+                userToRemove.AllChats.Remove(_chat);
+                _chat.Admins.Remove(userToRemove);
+                ChatFunctions.RemoveClientFromSpecificChat(userToRemove, _chat.Id);
+                SendMessageToClients($"{userToRemove.Id} was removed from group");
+            }
+        }
+
+        public void LeaveGroup(User user)
+        {
+            if (_chat.Admins.Contains(user))
+            {
+                _chat.Admins.Remove(user);
+            }
+            UsersInChat.Remove(user);
+            ChatFunctions.RemoveClientFromSpecificChat(user, _chat.Id);
+            SendMessageToClients($"{user.Id} left the group");
         }
     }
 }
