@@ -17,8 +17,7 @@ namespace ChatServer
         private int _port;
         private TcpListener _server;
         private ConsoleDisplayer _consoleDisplayer;
-        private int _counter = 0;
-        private Guid _globalChatId = Guid.NewGuid();
+        private readonly Guid _globalChatId = Guid.NewGuid();
         private Dictionary<Guid, List<User>> _usersInChats;
         private List<Chat> _allChats;
         private GlobalChatManager _globalChatManager;
@@ -46,14 +45,15 @@ namespace ChatServer
 
         public void StartListening()
         {
+            int usersCounter = 0;
             CreateServerSocket();
             _usersInChats[_globalChatId] = _globalChatManager.UsersInChat;
             _allChatManagers.Add(_globalChatManager);
             while (true)
             {
                 var clientSocket = _server.AcceptTcpClient();
-                _counter++;
-                var user = new User(clientSocket, _counter);
+                usersCounter++;
+                var user = new User(clientSocket, usersCounter);
                 _consoleDisplayer.PrintValueToConsole($"Client {user.Id} connected");
                 _clients.Add(user);
                 Task task = new Task(() => MapCientsChatChoice(user));
