@@ -6,9 +6,10 @@ namespace ChatClient
 {
     public class ClientManager
     {
+        private const string GET_ALL_CHATS = "0";
         private const string REGISTER_TO_GLOBAL_CHAT = "1";
         private const string REGISTER_TO_PRIVATE_CHAT = "2";
-        private const string GET_ALL_CHATS = "0";
+        private const string CREATE_GROUP_CHAT = "3";
         private Dictionary<string, string> _dispalyOptions;
         private ConsoleDisplayer _consoleDisplayer;
         private Client _client;
@@ -42,6 +43,10 @@ namespace ChatClient
                 else if (option == GET_ALL_CHATS)
                 {
                     PrintAllChats();
+                }
+                else if(option == CREATE_GROUP_CHAT)
+                {
+
                 }
             }
         }
