@@ -8,7 +8,7 @@ namespace ChatServer.ChatManagers
     public class GlobalChatManager : IChatManager
     {
         private Guid _globalChatId;
-        public List<User> UsersInChat;
+        public List<User> UsersInChat { get; set; }
         private const string GLOBAL_CHAT_NAME = "Global";
         public GeneralChatFunctions ChatFunctions;
         public List<User> OtherUsersInChat { get; set; }
