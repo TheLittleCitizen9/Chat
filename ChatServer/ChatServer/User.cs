@@ -1,4 +1,5 @@
-﻿using ChatServer.Chats;
+﻿using BasicChatContents;
+using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;

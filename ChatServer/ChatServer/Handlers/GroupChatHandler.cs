@@ -1,4 +1,5 @@
-﻿using ChatServer.ChatManagers;
+﻿using BasicChatContents;
+using ChatServer.ChatManagers;
 using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,6 @@ namespace ChatServer.Handlers
         private GeneralChatFunctions _chatFunctions;
         private List<IChatManager> _allChatManagers;
         private GeneralHandler _generalHandler;
-
 
         public GroupChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats,
             List<IChatManager> allChatManagers, GeneralHandler generalHandler, ClientHandler clientHandler)

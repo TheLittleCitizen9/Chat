@@ -39,8 +39,8 @@ namespace ChatServer
             _globalChatManager = new GlobalChatManager(_globalChatId, _chatFunctions);
             _allChats = new List<Chat>();
             _allChatManagers = new List<IChatManager>();
-            _generalHandler = new GeneralHandler(_clients, _clientHandler);
-            _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler, _clientHandler);
+            _generalHandler = new GeneralHandler();
+            _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers,  _clientHandler);
             _groupChatHandler = new GroupChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _generalHandler, _clientHandler);
         }
 
@@ -91,10 +91,10 @@ namespace ChatServer
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
-                _consoleDisplayer.PrintValueToConsole(e.Message);
+                _consoleDisplayer.PrintValueToConsole($"Client {user.Id} disconnected");
             }
         }
 

@@ -9,6 +9,5 @@ namespace ChatServer.ChatManagers
         void RemoveClientFromReceivingMessages(User user);
         void EnterUserToChat(User user);
         void ChatWithClient(User user);
-        //void SendMessageToClients(string dataToSend);
     }
 }

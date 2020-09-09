@@ -11,10 +11,10 @@ namespace ChatClient
         private const string REGISTER_TO_GLOBAL_CHAT = "1";
         private const string REGISTER_TO_PRIVATE_CHAT = "2";
         private const string CREATE_GROUP_CHAT = "3";
+        private const string EXIT_PROGRAM = "exit";
         private Dictionary<string, string> _dispalyOptions;
         private ConsoleDisplayer _consoleDisplayer;
         private Client _client;
-
         public ClientManager(Dictionary<string, string> options)
         {
             _dispalyOptions = options;
@@ -48,6 +48,11 @@ namespace ChatClient
                 else if(option == CREATE_GROUP_CHAT)
                 {
                     RegisterToGroupChat();
+                }
+                else if(option == EXIT_PROGRAM)
+                {
+                    _client.TcpClient.Close();
+                    Environment.Exit(0);
                 }
             }
         }

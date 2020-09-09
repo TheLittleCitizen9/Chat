@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BasicChatContents;
+using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ChatServer.Chats
 {

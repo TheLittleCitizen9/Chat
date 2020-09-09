@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicChatContents;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -52,10 +53,9 @@ namespace ChatServer.ChatManagers
                     NetworkStream nwStream = client.ClientSocket.GetStream();
                     nwStream.Write(data);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole(e.Message);
-                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole("CLient dissonnected");
+                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole($"CLient {client.Id} dissonnected");
                 }
             }
         }

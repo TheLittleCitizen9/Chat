@@ -9,7 +9,6 @@ namespace ChatServer.ChatManagers
     {
         public List<User> UsersInChat { get; set; }
         public GeneralChatFunctions ChatFunctions { get; set; }
-        //public List<User> OtherUsersInChat { get; set; }
         public void SendMessageToClients(string dataToSend)
         {
             byte[] data = Encoding.ASCII.GetBytes(dataToSend);
@@ -20,9 +19,9 @@ namespace ChatServer.ChatManagers
                     NetworkStream nwStream = client.ClientSocket.GetStream();
                     nwStream.Write(data);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole(e.Message);
+                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole($"Client {client.Id} disconnected");
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using ChatServer.ChatManagers;
+﻿using BasicChatContents;
+using ChatServer.ChatManagers;
 using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
@@ -12,18 +13,15 @@ namespace ChatServer.Handlers
         private List<Chat> _allChats;
         private GeneralChatFunctions _chatFunctions;
         private List<IChatManager> _allChatManagers;
-        private GeneralHandler _generalHandler;
         
-
         public PrivateChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats, 
-            List<IChatManager> allChatManagers, GeneralHandler generalHandler, ClientHandler clientHandler)
+            List<IChatManager> allChatManagers, ClientHandler clientHandler)
         {
             _clients = clients;
             _usersInChats = usersInChats;
             _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, clientHandler);
             _allChats = allChats;
             _allChatManagers = allChatManagers;
-            _generalHandler = generalHandler;
         }
         public void EnterUserToChat(User user, Guid id)
         {
