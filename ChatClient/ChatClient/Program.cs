@@ -12,6 +12,7 @@ namespace ChatClient
             options.Add("2", "Create Private Chat");
             options.Add("3", "Create Group Chat");
             options.Add("exit", "Exit Program");
+            options.Add("/{something}", "To See Something Funny");
             ClientManager clientManager = new ClientManager(options);
             clientManager.InitializeClient();
             clientManager.NavigateToChoice();

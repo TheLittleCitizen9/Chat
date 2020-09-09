@@ -12,6 +12,7 @@ namespace ChatClient
         private const string REGISTER_TO_PRIVATE_CHAT = "2";
         private const string CREATE_GROUP_CHAT = "3";
         private const string EXIT_PROGRAM = "exit";
+        private const char API_COMMAND = '/';
         private Dictionary<string, string> _dispalyOptions;
         private ConsoleDisplayer _consoleDisplayer;
         private Client _client;
@@ -53,6 +54,11 @@ namespace ChatClient
                 {
                     _client.TcpClient.Close();
                     Environment.Exit(0);
+                }
+                else if(option[0] == API_COMMAND)
+                {
+                    JokesApi translateToKlingon = new JokesApi();
+                    _consoleDisplayer.PrintValueToConsole(translateToKlingon.SendRequest());
                 }
             }
         }

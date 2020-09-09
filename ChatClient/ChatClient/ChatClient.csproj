@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RestSharp" Version="106.11.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="BasicChatContents">
       <HintPath>..\..\BasicChatContents\BasicChatContents\bin\Debug\netcoreapp3.1\BasicChatContents.dll</HintPath>
     </Reference>
