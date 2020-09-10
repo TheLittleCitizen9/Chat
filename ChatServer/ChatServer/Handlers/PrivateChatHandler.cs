@@ -45,6 +45,7 @@ namespace ChatServer.Handlers
         {
             Chat newPrivateChat = new Chat($"C{user.Id} + C{secondUser.Id}", id, ChatOptions.Private);
             _allChats.Add(newPrivateChat);
+            user.AddChat(newPrivateChat);
             _usersInChats[id].Add(secondUser);
             PrivateChatManager privateChatManager = new PrivateChatManager(_chatFunctions, newPrivateChat);
             _allChatManagers.Add(privateChatManager);

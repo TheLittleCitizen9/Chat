@@ -35,7 +35,7 @@ namespace ChatServer.ChatManagers
         {
             user.AddInactiveChatId(id);
             ChatFunctions.RemoveClient(user, UsersInChat, id);
-            SendMessageToClients($"Client {user.Id} left chat");
+            SendMessageToClients($"Client {user.Id} exited chat");
         }
     }
 }

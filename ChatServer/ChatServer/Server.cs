@@ -87,7 +87,7 @@ namespace ChatServer
             }
             catch (Exception)
             {
-
+                _clients.Remove(user);
                 _consoleDisplayer.PrintValueToConsole($"Client {user.Id} disconnected");
             }
         }

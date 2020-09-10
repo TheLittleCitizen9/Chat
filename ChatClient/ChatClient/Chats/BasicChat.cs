@@ -92,35 +92,8 @@ namespace ChatClient.Chats
                     _consoleDisplayer.PrintValueToConsole("Server disconnected");
                     Exit();
                 }
-
-                //Thread.Sleep(5);
             }
         }
-
-        //public virtual void GetMessagesFromServer()
-        //{
-        //    while (true)
-        //    {
-        //        try
-        //        {
-        //            if (_client.TcpClient.GetStream().DataAvailable)
-        //            {
-        //                NetworkStream nwStream = _client.TcpClient.GetStream();
-        //                nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
-        //                string recieved = Encoding.ASCII.GetString(_bytesReceived);
-        //                if (recieved.Replace("\0", string.Empty) != string.Empty)
-        //                {
-        //                    _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
-        //                }
-        //            }
-        //        }
-        //        catch (IOException)
-        //        {
-        //            _consoleDisplayer.PrintValueToConsole($"Server disconnected");
-        //            Exit();
-        //        }
-        //    }
-        //}
 
         public void PrintMessage(string message)
         {

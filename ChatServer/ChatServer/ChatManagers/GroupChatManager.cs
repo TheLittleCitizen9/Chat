@@ -114,7 +114,7 @@ namespace ChatServer.ChatManagers
 
         private User GetUser(User user)
         {
-            ChatFunctions.SendAllClientsConnected(user);
+            ChatFunctions.SendAllClientsInChat(user, _chat.Id);
             string userId = ChatFunctions.GetDataFromClient(user);
             return ChatFunctions.FindUser(userId);
         }

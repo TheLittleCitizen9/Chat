@@ -41,11 +41,20 @@ namespace ChatServer.ChatManagers
 
         public void EnterUserToChat(User user)
         {
-            OtherUsersInChat.Add(user);
-            UsersInChat.Add(user);
-            string clientConnectedMsg = $"Client {user.Id} connected";
-            SendMessageToClients(clientConnectedMsg);
-            ChatWithClient(user);
+            if(!UsersInChat.Contains(user))
+            {
+                OtherUsersInChat.Add(user);
+                UsersInChat.Add(user);
+                string clientConnectedMsg = $"Client {user.Id} connected";
+                SendMessageToClients(clientConnectedMsg);
+                ChatWithClient(user);
+            }
+            else
+            {
+                string clientConnectedMsg = $"Client {user.Id} connected";
+                SendMessageToClients(clientConnectedMsg);
+                ChatWithClient(user);
+            }
         }
     }
 }
