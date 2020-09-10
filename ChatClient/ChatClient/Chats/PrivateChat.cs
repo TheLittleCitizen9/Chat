@@ -6,10 +6,11 @@ namespace ChatClient.Chats
     public class PrivateChat : BasicChat
     {
         private const string NO_OTHER_USERS_CONNECTED = "No other users connected";
+        private ChatUtils _chatUtils;
         public PrivateChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
             : base(bytes, tcpClient, consoleDisplayer)
         {
-
+            _chatUtils = new ChatUtils();
         }
 
         public override void Run()
@@ -28,10 +29,10 @@ namespace ChatClient.Chats
             string[] allClients = allClientsConnected.Split(',');
             if(allClients[0].Replace("\0", string.Empty) != NO_OTHER_USERS_CONNECTED)
             {
-                PrintClientsConnected(allClients);
+                _chatUtils.PrintClientsConnected(allClients);
                 _consoleDisplayer.PrintValueToConsole("Enter client ID to talk to");
                 string id = Console.ReadLine();
-                if (ValidateId(id, allClients))
+                if (_chatUtils.ValidateId(id, allClients))
                 {
                     SendServerClientId(id);
                     return true;
@@ -49,27 +50,9 @@ namespace ChatClient.Chats
             }
         }
 
-        private void PrintClientsConnected(string[] clients)
-        {
-            foreach (var client in clients)
-            {
-                _consoleDisplayer.PrintValueToConsole(client);
-            }
-        }
-
         private void SendServerClientId(string id)
         {
-            base.WriteMessage(id);
-        }
-
-        private bool ValidateId(string id, string[] allClients)
-        {
-            foreach (var client in allClients)
-            {
-                if (client.Contains(id))
-                    return true;
-            }
-            return false;
+            WriteMessage(id);
         }
     }
 }

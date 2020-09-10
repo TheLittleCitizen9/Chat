@@ -1,15 +1,17 @@
 ﻿using BasicChatContents;
 using System;
+using System.Collections.Generic;
 
 namespace ChatClient.Chats
 {
     public class GroupChat : BasicChat
     {
         private const string NO_OTHER_USERS_CONNECTED = "No other users connected";
+        private ChatUtils _chatUtils;
         public GroupChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
             : base(bytes, tcpClient, consoleDisplayer)
         {
-
+            _chatUtils = new ChatUtils();
         }
 
         public override void ShowOptions()
@@ -52,7 +54,7 @@ namespace ChatClient.Chats
             string[] allClients = allClientsConnected.Split(',');
             if (allClients[0].Replace("\0", string.Empty) != NO_OTHER_USERS_CONNECTED)
             {
-                PrintClientsConnected(allClients);
+                _chatUtils.PrintClientsConnected(allClients);
                 _consoleDisplayer.PrintValueToConsole("Enter client IDs to talk to (put ',' between IDs)");
                 string ids = Console.ReadLine();
                 string[] clientsToAdd = ids.Split(',');
@@ -81,14 +83,6 @@ namespace ChatClient.Chats
             WriteMessage(chatName);
         }
 
-        private void PrintClientsConnected(string[] clients)
-        {
-            foreach (var client in clients)
-            {
-                _consoleDisplayer.PrintValueToConsole(client);
-            }
-        }
-
         private void SendServerClientIds(string ids)
         {
             WriteMessage(ids);
@@ -96,16 +90,12 @@ namespace ChatClient.Chats
 
         private bool ValidateIds(string[] ids, string[] allClients)
         {
-            bool result = false;
-            foreach (var client in allClients)
+            List< bool> result = new List<bool>();
+            foreach (var id in ids)
             {
-                foreach (var id in ids)
-                {
-                    if (client.Contains(id))
-                        result = true;
-                }
+                result.Add(_chatUtils.ValidateId(id, allClients));
             }
-            return result;
+            return !result.Contains(false);
         }
     }
 }
