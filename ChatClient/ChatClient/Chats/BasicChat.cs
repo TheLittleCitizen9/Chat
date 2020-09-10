@@ -1,7 +1,6 @@
 ﻿using BasicChatContents;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -13,7 +12,6 @@ namespace ChatClient.Chats
         protected Byte[] _bytesReceived;
         protected Client _client;
         protected ConsoleDisplayer _consoleDisplayer;
-        //protected CancellationTokenSource cancelationToken = new CancellationTokenSource();
         protected Dictionary<string, string> _options;
 
         public BasicChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)

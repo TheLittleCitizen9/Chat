@@ -68,7 +68,6 @@ namespace ChatClient
             _client.CurrentChat = new GlobalChat(_client.BytesReceived, _client, _client.ConsoleDisplayer);
             _client.CurrentChat.WriteMessage(REGISTER_TO_GLOBAL_CHAT);
             _client.CurrentChat.ShowOptions();
-            //_client.CurrentChat.ReadFromServer();
             _client.CurrentChat.Run();
         }
 
