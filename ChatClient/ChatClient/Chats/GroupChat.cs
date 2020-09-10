@@ -42,6 +42,7 @@ namespace ChatClient.Chats
                 if (message == "return" || message == "leave")
                 {
                     WriteMessage(message);
+                    cancelSource.Cancel();
                     break;
                 }
                 WriteMessage(message);

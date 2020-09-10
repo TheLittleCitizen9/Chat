@@ -14,6 +14,7 @@ namespace ChatClient.Chats
         protected Client _client;
         protected ConsoleDisplayer _consoleDisplayer;
         protected Dictionary<string, string> _options;
+        protected CancellationTokenSource cancelSource = new CancellationTokenSource();
 
         public BasicChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
         {
@@ -57,6 +58,7 @@ namespace ChatClient.Chats
                 if (message == "return")
                 {
                     WriteMessage(message);
+                    cancelSource.Cancel();
                     break;
                 }
                 WriteMessage(message);
@@ -69,6 +71,10 @@ namespace ChatClient.Chats
             {
                 try
                 {
+                    if(cancelSource.Token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     if (_client.TcpClient.GetStream().DataAvailable)
                     {
                         Thread.Sleep(15);
@@ -87,7 +93,7 @@ namespace ChatClient.Chats
                     Exit();
                 }
 
-                Thread.Sleep(5);
+                //Thread.Sleep(5);
             }
         }
 
