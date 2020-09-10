@@ -86,10 +86,9 @@ namespace ChatServer.ChatManagers
             if (_chat.Admins.Contains(user))
             {
                 var userToRemove = GetUser(user);
-                userToRemove.AllChats.Remove(_chat);
-                userToRemove.ActiveChatIds.Remove(_chat.Id);
-                userToRemove.InactiveChatIds.Remove(_chat.Id);
+                RemoveChatFromUser(userToRemove);
                 _chat.Admins.Remove(userToRemove);
+                UsersInChat.Remove(userToRemove);
                 ChatFunctions.RemoveClientFromSpecificChat(userToRemove, _chat.Id);
                 RemoveClientFromReceivingMessages(userToRemove, _chat.Id);
                 SendMessageToClients($"{userToRemove.Id} was removed from group");
@@ -107,7 +106,7 @@ namespace ChatServer.ChatManagers
                 _chat.Admins.Remove(user);
             }
             UsersInChat.Remove(user);
-            user.AllChats.Remove(_chat);
+            RemoveChatFromUser(user);
             ChatFunctions.RemoveClientFromSpecificChat(user, _chat.Id);
             RemoveClientFromReceivingMessages(user, _chat.Id);
             SendMessageToClients($"{user.Id} left the group");
@@ -118,6 +117,13 @@ namespace ChatServer.ChatManagers
             ChatFunctions.SendAllClientsConnected(user);
             string userId = ChatFunctions.GetDataFromClient(user);
             return ChatFunctions.FindUser(userId);
+        }
+
+        private void RemoveChatFromUser(User userToRemove)
+        {
+            userToRemove.AllChats.Remove(_chat);
+            userToRemove.ActiveChatIds.Remove(_chat.Id);
+            userToRemove.InactiveChatIds.Remove(_chat.Id);
         }
     }
 }

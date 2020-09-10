@@ -53,6 +53,7 @@ namespace ChatServer
             string clientDisconnectedMsg = $"Client {user.Id} disconnected";
             ConsoleDisplayer.PrintValueToConsole(clientDisconnectedMsg);
             RemoveClient(user);
+            Clients.Remove(user);
             return clientDisconnectedMsg;
         }
         public User FindUser(string id)
@@ -76,6 +77,32 @@ namespace ChatServer
             lock (_lock)
             {
                 foreach (var client in Clients)
+                {
+                    if (client != user)
+                    {
+                        allConnectedClients += $"Client {client.Id},";
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(allConnectedClients))
+            {
+                ClientHandler.SendClientMessage(noConnectedClients, user);
+                return false;
+            }
+            else
+            {
+                ClientHandler.SendClientMessage(allConnectedClients, user);
+                return true;
+            }
+        }
+
+        public bool SendAllClientsInChat(User user, Guid chatId)
+        {
+            string noConnectedClients = "No other users connected";
+            string allConnectedClients = string.Empty;
+            lock (_lock)
+            {
+                foreach (var client in UsersInChats[chatId])
                 {
                     if (client != user)
                     {
