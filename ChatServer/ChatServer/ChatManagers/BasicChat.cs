@@ -9,6 +9,11 @@ namespace ChatServer.ChatManagers
     {
         public List<User> UsersInChat { get; set; }
         public GeneralChatFunctions ChatFunctions { get; set; }
+
+        public BasicChat()
+        {
+            UsersInChat = new List<User>();
+        }
         public void SendMessageToClients(string dataToSend)
         {
             byte[] data = Encoding.ASCII.GetBytes(dataToSend);
@@ -24,6 +29,13 @@ namespace ChatServer.ChatManagers
                     ChatFunctions.ConsoleDisplayer.PrintValueToConsole($"Client {client.Id} disconnected");
                 }
             }
+        }
+
+        public void RemoveClientFromReceivingMessages(User user, Guid id)
+        {
+            user.AddNumbChatId(id);
+            ChatFunctions.RemoveClient(user, UsersInChat, id);
+            SendMessageToClients($"Client {user.Id} left chat");
         }
     }
 }

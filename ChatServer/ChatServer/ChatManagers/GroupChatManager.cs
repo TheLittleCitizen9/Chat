@@ -16,7 +16,6 @@ namespace ChatServer.ChatManagers
 
         public GroupChatManager(GeneralChatFunctions chatFunctions, GroupChat chat)
         {
-            UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
             _chat = chat;
             OtherUsersInChat = new List<User>();
@@ -32,7 +31,7 @@ namespace ChatServer.ChatManagers
                     string noNullValuesData = dataFromClient.Replace("\0", string.Empty);
                     if (noNullValuesData == RETURN_TO_MENU)
                     {
-                        RemoveClientFromReceivingMessages(user);
+                        RemoveClientFromReceivingMessages(user, _chat.Id);
                         break;
                     }
                     else if(noNullValuesData == ADD_ADMIN)
@@ -69,23 +68,17 @@ namespace ChatServer.ChatManagers
             SendMessageToClients(clientConnectedMsg);
             ChatWithClient(user);
         }
-
-        public void RemoveClientFromReceivingMessages(User user)
-        {
-            user.AddNumbChatId(_chat.Id);
-            ChatFunctions.RemoveClient(user, UsersInChat, _chat.Id);
-            SendMessageToClients($"Client {user.Id} left chat");
-        }
-
         public void AddUserAsAdmin(User user)
         {
             if (_chat.Admins.Contains(user))
             {
-                ChatFunctions.SendAllClientsConnected(user);
-                string userId = ChatFunctions.GetDataFromClient(user);
-                var newAdmin = ChatFunctions.FindUser(userId);
+                var newAdmin = GetUser(user);
                 _chat.Admins.Add(newAdmin);
                 SendMessageToClients($"{newAdmin.Id} is now an admin");
+            }
+            else
+            {
+                ChatFunctions.ClientHandler.SendClientMessage("You are not an admin, so you can't perform this action", user);
             }
         }
 
@@ -93,14 +86,16 @@ namespace ChatServer.ChatManagers
         {
             if (_chat.Admins.Contains(user))
             {
-                ChatFunctions.SendAllClientsConnected(user);
-                string userId = ChatFunctions.GetDataFromClient(user);
-                var userToRemove = ChatFunctions.FindUser(userId);
+                var userToRemove = GetUser(user);
                 userToRemove.AllChats.Remove(_chat);
                 _chat.Admins.Remove(userToRemove);
                 ChatFunctions.RemoveClientFromSpecificChat(userToRemove, _chat.Id);
-                RemoveClientFromReceivingMessages(userToRemove);
+                RemoveClientFromReceivingMessages(userToRemove, _chat.Id);
                 SendMessageToClients($"{userToRemove.Id} was removed from group");
+            }
+            else
+            {
+                ChatFunctions.ClientHandler.SendClientMessage("You are not an admin, so you can't perform this action", user);
             }
         }
 
@@ -113,8 +108,15 @@ namespace ChatServer.ChatManagers
             UsersInChat.Remove(user);
             user.AllChats.Remove(_chat);
             ChatFunctions.RemoveClientFromSpecificChat(user, _chat.Id);
-            RemoveClientFromReceivingMessages(user);
+            RemoveClientFromReceivingMessages(user, _chat.Id);
             SendMessageToClients($"{user.Id} left the group");
+        }
+
+        private User GetUser(User user)
+        {
+            ChatFunctions.SendAllClientsConnected(user);
+            string userId = ChatFunctions.GetDataFromClient(user);
+            return ChatFunctions.FindUser(userId);
         }
     }
 }

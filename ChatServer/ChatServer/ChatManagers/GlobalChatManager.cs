@@ -1,20 +1,16 @@
 ﻿using BasicChatContents;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 
 namespace ChatServer.ChatManagers
 {
-    public class GlobalChatManager : IChatManager
+    public class GlobalChatManager : BasicChat, IChatManager
     {
         private Guid _globalChatId;
-        public List<User> UsersInChat { get; set; }
         private const string GLOBAL_CHAT_NAME = "Global";
-        public GeneralChatFunctions ChatFunctions;
         public List<User> OtherUsersInChat { get; set; }
 
-        public GlobalChatManager(Guid id, GeneralChatFunctions chatFunctions)
+        public GlobalChatManager(Guid id, GeneralChatFunctions chatFunctions):base()
         {
             _globalChatId = id;
             UsersInChat = new List<User>();
@@ -31,11 +27,11 @@ namespace ChatServer.ChatManagers
                     string noNullValuesData = dataFromClient.Replace("\0", string.Empty);
                     if (noNullValuesData == "return")
                     {
-                        RemoveClientFromReceivingMessages(user);
+                        RemoveClientFromReceivingMessages(user, _globalChatId);
                         break;
                     }
                     string messageToClients = $"Client {user.Id} - {dataFromClient}";
-                    SendMessageToAllClients(messageToClients);
+                    SendMessageToClients(messageToClients);
                 }
             }
             catch (Exception)
@@ -43,38 +39,14 @@ namespace ChatServer.ChatManagers
                 ChatFunctions.DisconnectClient(user);
             }
         }
-        public void SendMessageToAllClients(string dataToSend)
-        {
-            byte[] data = Encoding.ASCII.GetBytes(dataToSend);
-            foreach (var client in UsersInChat)
-            {
-                try
-                {
-                    NetworkStream nwStream = client.ClientSocket.GetStream();
-                    nwStream.Write(data);
-                }
-                catch (Exception)
-                {
-                    ChatFunctions.ConsoleDisplayer.PrintValueToConsole($"CLient {client.Id} dissonnected");
-                }
-            }
-        }
-
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_globalChatId);
             user.AddChat(new Chats.Chat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global));
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
-            SendMessageToAllClients(clientConnectedMsg);
+            SendMessageToClients(clientConnectedMsg);
             ChatWithClient(user);
-        }
-
-        public void RemoveClientFromReceivingMessages(User user)
-        {
-            user.AddNumbChatId(_globalChatId);
-            ChatFunctions.RemoveClient(user, UsersInChat, _globalChatId);
-            SendMessageToAllClients($"Client {user.Id} left chat");
         }
     }
 }

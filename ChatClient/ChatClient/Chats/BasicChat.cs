@@ -82,9 +82,8 @@ namespace ChatClient.Chats
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    _consoleDisplayer.PrintValueToConsole(e.Message);
                     _consoleDisplayer.PrintValueToConsole("Server disconnected");
                     Exit();
                 }

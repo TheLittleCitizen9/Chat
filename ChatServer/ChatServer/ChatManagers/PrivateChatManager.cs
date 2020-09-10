@@ -1,5 +1,4 @@
-﻿using BasicChatContents;
-using ChatServer.Chats;
+﻿using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
 
@@ -13,9 +12,7 @@ namespace ChatServer.ChatManagers
 
         public PrivateChatManager(GeneralChatFunctions chatFunctions, Chat chat)
         {
-            UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
-            //ChatFunctions.ActiveUsersInChat = UsersInChat;
             _chat = chat;
             OtherUsersInChat = new List<User>();
         }
@@ -30,7 +27,7 @@ namespace ChatServer.ChatManagers
                     string noNullValuesData = dataFromClient.Replace("\0", string.Empty);
                     if (noNullValuesData == "return")
                     {
-                        RemoveClientFromReceivingMessages(user);
+                        RemoveClientFromReceivingMessages(user, _chat.Id);
                         break;
                     }
                     string messageToClients = $"Client {user.Id} - {dataFromClient}";
@@ -50,13 +47,6 @@ namespace ChatServer.ChatManagers
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);
             ChatWithClient(user);
-        }
-
-        public void RemoveClientFromReceivingMessages(User user)
-        {
-            user.AddNumbChatId(_chat.Id);
-            ChatFunctions.RemoveClient(user, UsersInChat, _chat.Id);
-            SendMessageToClients($"Client {user.Id} left chat");
         }
     }
 }

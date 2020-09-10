@@ -6,24 +6,22 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
-namespace ChatServer.ChatManagers
+namespace ChatServer
 {
     public class GeneralChatFunctions
     {
         public List<User> Clients;
         public ConsoleDisplayer ConsoleDisplayer;
         public Dictionary<Guid, List<User>> UsersInChats;
-        //public List<User> ActiveUsersInChat { get; set; }
 
-        public ClientHandler _clientHandler;
+        public ClientHandler ClientHandler;
         private object _lock = new object();
         public GeneralChatFunctions(Dictionary<Guid, List<User>> usersInChats, List<User> clients, ClientHandler clientHandler)
         {
             UsersInChats = usersInChats;
             Clients = clients;
             ConsoleDisplayer = new ConsoleDisplayer();
-            //ActiveUsersInChat = new List<User>();
-            _clientHandler = clientHandler;
+            ClientHandler = clientHandler;
         }
         public string GetDataFromClient(User user)
         {
@@ -71,12 +69,12 @@ namespace ChatServer.ChatManagers
             }
             if (string.IsNullOrEmpty(allConnectedClients))
             {
-                _clientHandler.SendClientMessage(noConnectedClients, user);
+                ClientHandler.SendClientMessage(noConnectedClients, user);
                 return false;
             }
             else
             {
-                _clientHandler.SendClientMessage(allConnectedClients, user);
+                ClientHandler.SendClientMessage(allConnectedClients, user);
                 return true;
             }
         }
