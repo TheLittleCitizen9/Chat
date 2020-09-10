@@ -1,6 +1,7 @@
 ﻿using BasicChatContents;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -12,13 +13,15 @@ namespace ChatClient.Chats
         protected Byte[] _bytesReceived;
         protected Client _client;
         protected ConsoleDisplayer _consoleDisplayer;
-        protected CancellationTokenSource cancelationToken = new CancellationTokenSource();
+        //protected CancellationTokenSource cancelationToken = new CancellationTokenSource();
+        protected Dictionary<string, string> _options;
 
         public BasicChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
         {
             _bytesReceived = bytes;
             _client = tcpClient;
             _consoleDisplayer = consoleDisplayer;
+            _options = new Dictionary<string, string>();
         }
 
         public virtual void Run()
@@ -28,10 +31,9 @@ namespace ChatClient.Chats
 
         public virtual void ShowOptions()
         {
-            Dictionary<string, string> options = new Dictionary<string, string>();
-            options.Add("return", "return to main menu");
-            options.Add("exit", "exit program");
-            _consoleDisplayer.PrintMenu(options);
+            _options.Add("return", "return to main menu");
+            _options.Add("exit", "exit program");
+            _consoleDisplayer.PrintMenu(_options);
         }
         public void WriteMessage(string message)
         {
@@ -90,6 +92,31 @@ namespace ChatClient.Chats
                 Thread.Sleep(5);
             }
         }
+
+        //public virtual void GetMessagesFromServer()
+        //{
+        //    while (true)
+        //    {
+        //        try
+        //        {
+        //            if (_client.TcpClient.GetStream().DataAvailable)
+        //            {
+        //                NetworkStream nwStream = _client.TcpClient.GetStream();
+        //                nwStream.Read(_bytesReceived, 0, _bytesReceived.Length);
+        //                string recieved = Encoding.ASCII.GetString(_bytesReceived);
+        //                if (recieved.Replace("\0", string.Empty) != string.Empty)
+        //                {
+        //                    _consoleDisplayer.PrintValueToConsole(Encoding.ASCII.GetString(_bytesReceived));
+        //                }
+        //            }
+        //        }
+        //        catch (IOException)
+        //        {
+        //            _consoleDisplayer.PrintValueToConsole($"Server disconnected");
+        //            Exit();
+        //        }
+        //    }
+        //}
 
         public void PrintMessage(string message)
         {

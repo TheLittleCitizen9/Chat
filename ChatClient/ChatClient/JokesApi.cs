@@ -4,7 +4,7 @@ namespace ChatClient
 {
     public class JokesApi
     {
-        private const string URL = "https://sv443.net/jokeapi/v2/joke/Any?format=txt";
+        private const string URL = "https://sv443.net/jokeapi/v2/joke/Programming,Pun?blacklistFlags=racist,sexist&format=txt";
 
         public string SendRequest()
         {

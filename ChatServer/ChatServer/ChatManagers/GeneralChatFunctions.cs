@@ -13,7 +13,7 @@ namespace ChatServer.ChatManagers
         public List<User> Clients;
         public ConsoleDisplayer ConsoleDisplayer;
         public Dictionary<Guid, List<User>> UsersInChats;
-        public List<User> ActiveUsersInChat { get; set; }
+        //public List<User> ActiveUsersInChat { get; set; }
 
         public ClientHandler _clientHandler;
         private object _lock = new object();
@@ -22,7 +22,7 @@ namespace ChatServer.ChatManagers
             UsersInChats = usersInChats;
             Clients = clients;
             ConsoleDisplayer = new ConsoleDisplayer();
-            ActiveUsersInChat = new List<User>();
+            //ActiveUsersInChat = new List<User>();
             _clientHandler = clientHandler;
         }
         public string GetDataFromClient(User user)
@@ -89,15 +89,15 @@ namespace ChatServer.ChatManagers
                 user.AllChats.Add(chat);
             }
         }
-        public void RemoveClient(User user, Guid chatId = default)
+        public void RemoveClient(User user, List<User> activeUsersInChat=null, Guid chatId = default)
         {
             if (chatId == default)
             {
                 RemoveUserFromAllChats(user);
             }
-            else
+            else if(activeUsersInChat != null)
             {
-                ActiveUsersInChat.Remove(user);
+                activeUsersInChat.Remove(user);
             }
         }
         public void RemoveClientFromSpecificChat(User user, Guid chatId)
@@ -110,7 +110,7 @@ namespace ChatServer.ChatManagers
                     break;
                 }
             }
-            RemoveClient(user, chatId);
+            RemoveClient(user, chatId:chatId);
         }
 
         private void RemoveUserFromAllChats(User user)
@@ -118,14 +118,7 @@ namespace ChatServer.ChatManagers
             Clients.Remove(user);
             foreach (KeyValuePair<Guid, List<User>> pair in UsersInChats)
             {
-                foreach (var usr in pair.Value)
-                {
-                    if (usr == user)
-                    {
-                        pair.Value.Remove(usr);
-                        break;
-                    }
-                }
+                RemoveClientFromSpecificChat(user, pair.Key);
             }
         }
     }

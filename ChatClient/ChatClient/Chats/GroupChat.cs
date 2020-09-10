@@ -12,6 +12,14 @@ namespace ChatClient.Chats
 
         }
 
+        public override void ShowOptions()
+        {
+            _options.Add("add admin", "To add a user as admin");
+            _options.Add("remove", "To remove a user from the group");
+            _options.Add("leave", "To leave the group");
+            base.ShowOptions();
+        }
+
         public override void Run()
         {
             string allClientsConnected = _client.GetMessageFromServer();
@@ -70,7 +78,7 @@ namespace ChatClient.Chats
         {
             _consoleDisplayer.PrintValueToConsole("Enter Chat Name");
             string chatName = Console.ReadLine();
-            base.WriteMessage(chatName);
+            WriteMessage(chatName);
         }
 
         private void PrintClientsConnected(string[] clients)
@@ -83,7 +91,7 @@ namespace ChatClient.Chats
 
         private void SendServerClientIds(string ids)
         {
-            base.WriteMessage(ids);
+            WriteMessage(ids);
         }
 
         private bool ValidateIds(string[] ids, string[] allClients)

@@ -12,6 +12,7 @@ namespace ChatClient.Chats
         }
         public override void Run()
         {
+            base.ReadFromServer();
             WriteMessage();
         }
     }

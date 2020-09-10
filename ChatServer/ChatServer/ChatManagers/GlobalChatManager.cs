@@ -63,7 +63,7 @@ namespace ChatServer.ChatManagers
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_globalChatId);
-            user.AddChat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global);
+            user.AddChat(new Chats.Chat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global));
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToAllClients(clientConnectedMsg);
@@ -73,7 +73,7 @@ namespace ChatServer.ChatManagers
         public void RemoveClientFromReceivingMessages(User user)
         {
             user.AddNumbChatId(_globalChatId);
-            ChatFunctions.RemoveClient(user, _globalChatId);
+            ChatFunctions.RemoveClient(user, UsersInChat, _globalChatId);
             SendMessageToAllClients($"Client {user.Id} left chat");
         }
     }

@@ -1,5 +1,4 @@
-﻿using BasicChatContents;
-using ChatServer.Chats;
+﻿using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
 
@@ -19,7 +18,6 @@ namespace ChatServer.ChatManagers
         {
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
-            ChatFunctions.ActiveUsersInChat = UsersInChat;
             _chat = chat;
             OtherUsersInChat = new List<User>();
         }
@@ -48,6 +46,7 @@ namespace ChatServer.ChatManagers
                     else if (noNullValuesData == LEAVE_GROUP)
                     {
                         LeaveGroup(user);
+                        break;
                     }
                     else
                     {
@@ -64,7 +63,7 @@ namespace ChatServer.ChatManagers
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_chat.Id);
-            user.AddChat(_chat.Name, _chat.Id, ChatOptions.Group);
+            user.AddChat(_chat);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);
@@ -74,7 +73,7 @@ namespace ChatServer.ChatManagers
         public void RemoveClientFromReceivingMessages(User user)
         {
             user.AddNumbChatId(_chat.Id);
-            ChatFunctions.RemoveClient(user, _chat.Id);
+            ChatFunctions.RemoveClient(user, UsersInChat, _chat.Id);
             SendMessageToClients($"Client {user.Id} left chat");
         }
 
@@ -112,6 +111,7 @@ namespace ChatServer.ChatManagers
                 _chat.Admins.Remove(user);
             }
             UsersInChat.Remove(user);
+            user.AllChats.Remove(_chat);
             ChatFunctions.RemoveClientFromSpecificChat(user, _chat.Id);
             RemoveClientFromReceivingMessages(user);
             SendMessageToClients($"{user.Id} left the group");

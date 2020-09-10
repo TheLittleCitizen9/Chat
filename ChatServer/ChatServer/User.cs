@@ -52,9 +52,9 @@ namespace ChatServer
             ActiveChatIds.Remove(id);
         }
 
-        public void AddChat(string name, Guid id, ChatOptions option)
+        public void AddChat(Chat chat)
         {
-            AllChats.Add(new Chat(name, id, option));
+            AllChats.Add(chat);
         }
     }
 }

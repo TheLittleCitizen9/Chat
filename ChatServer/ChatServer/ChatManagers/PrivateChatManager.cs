@@ -15,7 +15,7 @@ namespace ChatServer.ChatManagers
         {
             UsersInChat = new List<User>();
             ChatFunctions = chatFunctions;
-            ChatFunctions.ActiveUsersInChat = UsersInChat;
+            //ChatFunctions.ActiveUsersInChat = UsersInChat;
             _chat = chat;
             OtherUsersInChat = new List<User>();
         }
@@ -45,7 +45,7 @@ namespace ChatServer.ChatManagers
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_chat.Id);
-            user.AddChat(_chat.Name, _chat.Id, ChatOptions.Private);
+            user.AddChat(_chat);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);
@@ -55,7 +55,7 @@ namespace ChatServer.ChatManagers
         public void RemoveClientFromReceivingMessages(User user)
         {
             user.AddNumbChatId(_chat.Id);
-            ChatFunctions.RemoveClient(user, _chat.Id);
+            ChatFunctions.RemoveClient(user, UsersInChat, _chat.Id);
             SendMessageToClients($"Client {user.Id} left chat");
         }
     }
