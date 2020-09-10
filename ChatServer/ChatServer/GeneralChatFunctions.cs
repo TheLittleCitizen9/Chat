@@ -3,6 +3,7 @@ using ChatServer.Chats;
 using ChatServer.Handlers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
@@ -30,6 +31,21 @@ namespace ChatServer
             int bytesRecieved = nwStream.Read(buffer); 
             string stringData = Encoding.ASCII.GetString(buffer);
             return stringData;
+        }
+
+        public bool CheckIfAListContainsAnother(List<User> users, List<User> otherUsers, List<User> usersInChat)
+        {
+            if (!users.Equals(otherUsers))
+            {
+                var allUsersInChat = otherUsers.Select(u => u).ToList();
+                allUsersInChat.AddRange(usersInChat);
+                var result = users.Intersect(allUsersInChat).ToList();
+                if (result.Count != users.Count)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public string DisconnectClient(User user)
@@ -83,7 +99,7 @@ namespace ChatServer
         {
             foreach (var user in users)
             {
-                user.NumbChatIds.Add(chat.Id);
+                user.InactiveChatIds.Add(chat.Id);
                 user.AllChats.Add(chat);
             }
         }

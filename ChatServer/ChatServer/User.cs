@@ -1,5 +1,4 @@
-﻿using BasicChatContents;
-using ChatServer.Chats;
+﻿using ChatServer.Chats;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -12,7 +11,7 @@ namespace ChatServer
         public List<TcpClient> ClientsInChatWith;
         public int Id;
         public List<Guid> ActiveChatIds;
-        public List<Guid> NumbChatIds;
+        public List<Guid> InactiveChatIds;
         public List<Chat> AllChats;
 
         public User(TcpClient tcpClient, int id)
@@ -21,7 +20,7 @@ namespace ChatServer
             ClientsInChatWith = new List<TcpClient>();
             Id = id;
             ActiveChatIds = new List<Guid>();
-            NumbChatIds = new List<Guid>();
+            InactiveChatIds = new List<Guid>();
             AllChats = new List<Chat>();
         }
 
@@ -35,10 +34,10 @@ namespace ChatServer
 
         public void AddActiveChatId(Guid id)
         {
-            if(NumbChatIds.Contains(id))
+            if(InactiveChatIds.Contains(id))
             {
                 ActiveChatIds.Add(id);
-                NumbChatIds.Remove(id);
+                InactiveChatIds.Remove(id);
             }
             else
             {
@@ -48,7 +47,7 @@ namespace ChatServer
 
         public void AddNumbChatId(Guid id)
         {
-            NumbChatIds.Add(id);
+            InactiveChatIds.Add(id);
             ActiveChatIds.Remove(id);
         }
 

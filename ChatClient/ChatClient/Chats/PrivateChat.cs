@@ -5,7 +5,6 @@ namespace ChatClient.Chats
 {
     public class PrivateChat : BasicChat
     {
-        private const string NO_OTHER_USERS_CONNECTED = "No other users connected";
         private ChatUtils _chatUtils;
         public PrivateChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
             : base(bytes, tcpClient, consoleDisplayer)

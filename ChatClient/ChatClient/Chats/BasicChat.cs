@@ -9,6 +9,7 @@ namespace ChatClient.Chats
 {
     public class BasicChat
     {
+        protected const string NO_OTHER_USERS_CONNECTED = "No other users connected";
         protected Byte[] _bytesReceived;
         protected Client _client;
         protected ConsoleDisplayer _consoleDisplayer;

@@ -14,17 +14,15 @@ namespace ChatServer.Handlers
         private List<Chat> _allChats;
         private GeneralChatFunctions _chatFunctions;
         private List<IChatManager> _allChatManagers;
-        private GeneralHandler _generalHandler;
 
         public GroupChatHandler(List<User> clients, Dictionary<Guid, List<User>> usersInChats, List<Chat> allChats,
-            List<IChatManager> allChatManagers, GeneralHandler generalHandler, ClientHandler clientHandler)
+            List<IChatManager> allChatManagers, ClientHandler clientHandler)
         {
             _clients = clients;
             _usersInChats = usersInChats;
             _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, clientHandler);
             _allChats = allChats;
             _allChatManagers = allChatManagers;
-            _generalHandler = generalHandler;
         }
 
         public void EnterUserToChat(User user, Guid id)
@@ -74,7 +72,7 @@ namespace ChatServer.Handlers
                         foreach (var manager in _allChatManagers)
                         {
                             if (manager.OtherUsersInChat.Count == otherUsers.Count && 
-                                (_generalHandler.CheckIfAListContainsAnother(otherUsers, manager.OtherUsersInChat, manager.UsersInChat)))
+                                (_chatFunctions.CheckIfAListContainsAnother(otherUsers, manager.OtherUsersInChat, manager.UsersInChat)))
                             {
                                 manager.EnterUserToChat(user);
                                 return true;
