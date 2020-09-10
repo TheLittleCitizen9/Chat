@@ -17,11 +17,9 @@ namespace ChatServer
         private int _port;
         private TcpListener _server;
         private ConsoleDisplayer _consoleDisplayer;
-        private readonly Guid _globalChatId = Guid.NewGuid();
         private Dictionary<Guid, List<User>> _usersInChats;
         private List<Chat> _allChats;
-        private GlobalChatManager _globalChatManager;
-        private GeneralChatFunctions _chatFunctions;
+        private GlobalChatHandler _globalChatHandler;
         private List<IChatManager> _allChatManagers;
         private ClientHandler _clientHandler;
         private PrivateChatHandler _privateChatHandler;
@@ -33,10 +31,9 @@ namespace ChatServer
             _clients = new List<User>();
             _consoleDisplayer = new ConsoleDisplayer();
             _usersInChats = new Dictionary<Guid, List<User>>();
-            _chatFunctions = new GeneralChatFunctions(_usersInChats, _clients, _clientHandler);
-            _globalChatManager = new GlobalChatManager(_globalChatId, _chatFunctions);
-            _allChats = new List<Chat>();
             _allChatManagers = new List<IChatManager>();
+            _allChats = new List<Chat>();
+            _globalChatHandler = new GlobalChatHandler(_clients, _usersInChats, _allChatManagers, _clientHandler);
             _privateChatHandler = new PrivateChatHandler(_clients, _usersInChats, _allChats, _allChatManagers,  _clientHandler);
             _groupChatHandler = new GroupChatHandler(_clients, _usersInChats, _allChats, _allChatManagers, _clientHandler);
         }
@@ -45,8 +42,7 @@ namespace ChatServer
         {
             int usersCounter = 0;
             CreateServerSocket();
-            _usersInChats[_globalChatId] = _globalChatManager.UsersInChat;
-            _allChatManagers.Add(_globalChatManager);
+            _globalChatHandler.AddGlobalChat();
             while (true)
             {
                 var clientSocket = _server.AcceptTcpClient();
@@ -65,7 +61,7 @@ namespace ChatServer
             {
                 while (true)
                 {
-                    string clientChatChoice = _globalChatManager.ChatFunctions.GetDataFromClient(user);
+                    string clientChatChoice = _globalChatHandler.ChatFunctions.GetDataFromClient(user);
                     if (Enum.TryParse(typeof(ChatOptions), clientChatChoice, out object chatChoice))
                     {
                         if ((ChatOptions)chatChoice == ChatOptions.Global)
@@ -98,8 +94,7 @@ namespace ChatServer
 
         private void EnterGlobalChat(User user)
         {
-            _globalChatManager.OtherUsersInChat.Add(user);
-            _globalChatManager.EnterUserToChat(user);
+            _globalChatHandler.EnterUserToChat(user);
         }
         
         private void EnterPrivateChat(User user, Guid id)

@@ -45,7 +45,7 @@ namespace ChatServer
             }
         }
 
-        public void AddNumbChatId(Guid id)
+        public void AddInactiveChatId(Guid id)
         {
             InactiveChatIds.Add(id);
             ActiveChatIds.Remove(id);

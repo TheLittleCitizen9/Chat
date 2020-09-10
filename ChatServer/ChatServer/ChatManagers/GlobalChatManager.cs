@@ -7,10 +7,9 @@ namespace ChatServer.ChatManagers
     public class GlobalChatManager : BasicChat, IChatManager
     {
         private Guid _globalChatId;
-        private const string GLOBAL_CHAT_NAME = "Global";
         public List<User> OtherUsersInChat { get; set; }
 
-        public GlobalChatManager(Guid id, GeneralChatFunctions chatFunctions):base()
+        public GlobalChatManager(Guid id, GeneralChatFunctions chatFunctions)
         {
             _globalChatId = id;
             UsersInChat = new List<User>();
@@ -39,10 +38,10 @@ namespace ChatServer.ChatManagers
                 ChatFunctions.DisconnectClient(user);
             }
         }
+
         public void EnterUserToChat(User user)
         {
-            user.AddActiveChatId(_globalChatId);
-            user.AddChat(new Chats.Chat(GLOBAL_CHAT_NAME, _globalChatId, ChatOptions.Global));
+            OtherUsersInChat.Add(user);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);

@@ -6,7 +6,7 @@ namespace ChatClient.Chats
     public class PrivateChat : BasicChat
     {
         private ChatUtils _chatUtils;
-        public PrivateChat(Byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
+        public PrivateChat(byte[] bytes, Client tcpClient, ConsoleDisplayer consoleDisplayer)
             : base(bytes, tcpClient, consoleDisplayer)
         {
             _chatUtils = new ChatUtils();

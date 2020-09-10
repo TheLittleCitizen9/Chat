@@ -48,6 +48,7 @@ namespace ChatServer.Handlers
         {
             GroupChat newGroupChat = new GroupChat($"{chatName}", id, ChatOptions.Group);
             newGroupChat.Admins.Add(user);
+            user.AddChat(newGroupChat);
             _allChats.Add(newGroupChat);
             _usersInChats[id].AddRange(otherUsers);
             GroupChatManager groupChatManager = new GroupChatManager(_chatFunctions, newGroupChat);

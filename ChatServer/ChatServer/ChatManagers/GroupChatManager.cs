@@ -62,7 +62,6 @@ namespace ChatServer.ChatManagers
         public void EnterUserToChat(User user)
         {
             user.AddActiveChatId(_chat.Id);
-            user.AddChat(_chat);
             UsersInChat.Add(user);
             string clientConnectedMsg = $"Client {user.Id} connected";
             SendMessageToClients(clientConnectedMsg);
@@ -88,6 +87,8 @@ namespace ChatServer.ChatManagers
             {
                 var userToRemove = GetUser(user);
                 userToRemove.AllChats.Remove(_chat);
+                userToRemove.ActiveChatIds.Remove(_chat.Id);
+                userToRemove.InactiveChatIds.Remove(_chat.Id);
                 _chat.Admins.Remove(userToRemove);
                 ChatFunctions.RemoveClientFromSpecificChat(userToRemove, _chat.Id);
                 RemoveClientFromReceivingMessages(userToRemove, _chat.Id);

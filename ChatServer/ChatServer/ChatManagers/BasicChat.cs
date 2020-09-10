@@ -33,7 +33,7 @@ namespace ChatServer.ChatManagers
 
         public void RemoveClientFromReceivingMessages(User user, Guid id)
         {
-            user.AddNumbChatId(id);
+            user.AddInactiveChatId(id);
             ChatFunctions.RemoveClient(user, UsersInChat, id);
             SendMessageToClients($"Client {user.Id} left chat");
         }
